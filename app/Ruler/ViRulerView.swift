@@ -46,50 +46,22 @@ class ViRulerView: NSRulerView {
                 fatalError("Tried to use ViRulerView without a text view.")
             }
             
-            for var helper in helpers {
+            for var helper in helperConfig.helpers {
                 helper.textView = textView
-            }
-            
-            NSNotificationCenter.defaultCenter().addObserver(self,
-                selector: "textStorageDidChangeLines:",
-                name: ViTextStorageChangedLinesNotification,
-                object: textView.textStorage)
-            
-            NSNotificationCenter.defaultCenter().addObserver(self,
-                selector: "ruleThicknessUpdateNeeded:",
-                name: ViCaretChangedNotification,
-                object: textView)
-            
-            if oldValue?.document != textView.document {
-                for notification in ViLineNumberView.rerenderingDocumentNotifications {
-                    NSNotificationCenter.defaultCenter().addObserver(self,
-                        selector: "ruleThicknessUpdateNeeded:",
-                        name: notification,
-                        object: textView.document)
-                }
             }
         }
     }
     
-    private var _helpers: [ViRulerHelper] = []
-    private var helpers: [ViRulerHelper] {
+    private var _helperConfig: ViRulerHelperConfig = ViRulerHelperConfig()
+    private var helperConfig: ViRulerHelperConfig {
         get {
-            if let textView = self.textView where _helpers.isEmpty {
-                _helpers = helpersForTextView(textView, backgroundColor: backgroundColor)
+            if let textView = self.textView where _helperConfig.helpers.isEmpty {
+                _helperConfig = ViRulerHelperConfig.defaultHelpersForTextView(textView, backgroundColor: backgroundColor)
                 
-                for helper in _helpers {
-                    let view = helper.helperView
-                    
-                    self.addSubview(view)
-                    NSNotificationCenter.defaultCenter().addObserver(self,
-                        selector: "ruleThicknessUpdateNeeded:",
-                        name: NSViewFrameDidChangeNotification,
-                        object: view
-                    )
-                }
+                _helperConfig.installOnRuler(self)
             }
             
-            return _helpers
+            return _helperConfig
         }
     }
     
@@ -108,6 +80,10 @@ class ViRulerView: NSRulerView {
     
     init(scrollView: NSScrollView) {
         super.init(scrollView: scrollView, orientation: .VerticalRuler)
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.reservedThicknessForAccessoryView = 0
+        self.reservedThicknessForMarkers = 0
     }
 
     required init?(coder: NSCoder) {
@@ -118,24 +94,17 @@ class ViRulerView: NSRulerView {
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
-    @objc func ruleThicknessUpdateNeeded(notification: NSNotification) {
-        updateRuleThickness()
-    }
-    
-    @objc func textStorageDidChangeLines(notification: NSNotification) {
-        needsDisplay = true
-    }
-    
-    private func updateRuleThickness() {
-        let newThickness = helpers.reduce(0, combine: { $0 + $1.helperView.frame.width })
+    override func layout() {
+        super.layout()
         
+        let newThickness = fittingSize.width
         if newThickness != ruleThickness {
+            // Delay this update, as running it directly in response to the notifications
+            // that trigger it can result in exceptions all over the layout manager.
             NSOperationQueue.mainQueue().addOperationWithBlock({ [weak self] () -> Void in
                 self?.ruleThickness = newThickness
             })
         }
-        
-        needsDisplay = true
     }
     
     private func fillBackground() {
@@ -154,19 +123,15 @@ class ViRulerView: NSRulerView {
     }
     
     override func drawHashMarksAndLabelsInRect(rect: NSRect) {
-        if let visibleRect = scrollView?.contentView.bounds {
-            fillBackground()
-            drawMargin()
-            
-            for helper in helpers {
-                helper.drawInRect(rect, visibleRect: visibleRect)
-            }
+        fillBackground()
+        drawMargin()
+        
+        for helperView in helperConfig.helperViews {
+            helperView.needsDisplay = true
         }
     }
     
     func resetTextAttributes() {
-        for helper in helpers {
-            helper.resetTextAttributes()
-        }
+        NSLog("Shouldn't be resetting text attributes on the ruler view.")
     }
 }

@@ -31,6 +31,7 @@
 		179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */; };
 		179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */; };
 		17A063871B9D287E0007AD5A /* ViRulerHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */; settings = {ASSET_TAGS = (); }; };
+		17A0638E1B9D2EAB0007AD5A /* ViRulerHelperConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A0638D1B9D2EAB0007AD5A /* ViRulerHelperConfig.swift */; settings = {ASSET_TAGS = (); }; };
 		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
 		17B1FB9B1B9B8BC300477C92 /* ViFoldMarginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B1FB9A1B9B8BC300477C92 /* ViFoldMarginView.swift */; };
 		17BA92AD1840440000B1252E /* ViLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17BA92AC1840440000B1252E /* ViLineNumberView.m */; };
@@ -483,6 +484,7 @@
 		179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViTextAttribute.swift; sourceTree = "<group>"; };
 		179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViGlyphGenerator.swift; path = "Text Rendering/ViGlyphGenerator.swift"; sourceTree = "<group>"; };
 		17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRulerHelperView.swift; path = Ruler/ViRulerHelperView.swift; sourceTree = "<group>"; };
+		17A0638D1B9D2EAB0007AD5A /* ViRulerHelperConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRulerHelperConfig.swift; path = Ruler/ViRulerHelperConfig.swift; sourceTree = "<group>"; };
 		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
 		17A38DF018405E5200C44D50 /* ViFoldMarginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFoldMarginView.m; sourceTree = "<group>"; };
 		17B1FB9A1B9B8BC300477C92 /* ViFoldMarginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViFoldMarginView.swift; path = Ruler/ViFoldMarginView.swift; sourceTree = "<group>"; };
@@ -1091,6 +1093,7 @@
 				178EAF371B4094B9008C7BA1 /* ViLineNumberView.swift */,
 				17B1FB9A1B9B8BC300477C92 /* ViFoldMarginView.swift */,
 				17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */,
+				17A0638D1B9D2EAB0007AD5A /* ViRulerHelperConfig.swift */,
 			);
 			name = Ruler;
 			sourceTree = "<group>";
@@ -2145,6 +2148,7 @@
 				9A2EF46B133114AE0023C5B7 /* LangBulgarianModel.cpp in Sources */,
 				9A2EF46C133114AE0023C5B7 /* LangCyrillicModel.cpp in Sources */,
 				9A2EF46D133114AE0023C5B7 /* LangGreekModel.cpp in Sources */,
+				17A0638E1B9D2EAB0007AD5A /* ViRulerHelperConfig.swift in Sources */,
 				9A2EF46E133114AE0023C5B7 /* LangHebrewModel.cpp in Sources */,
 				9A2EF46F133114AE0023C5B7 /* LangHungarianModel.cpp in Sources */,
 				9A2EF470133114AE0023C5B7 /* LangThaiModel.cpp in Sources */,
@@ -2503,6 +2507,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
+				DEFINES_MODULE = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = unsupported;
@@ -2679,6 +2684,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
+				DEFINES_MODULE = YES;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -2714,6 +2720,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				DEFINES_MODULE = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = unsupported;

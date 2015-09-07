@@ -73,12 +73,10 @@ class ViLineNumberView: ViRulerHelperView {
         }
     }
     
-    var relative: Bool = false {
+    private var relative: Bool = false {
         didSet {
             if relative != oldValue {
                 updateViewFrame()
-                
-                self.superview?.needsDisplay = true
             }
         }
     }
@@ -95,18 +93,6 @@ class ViLineNumberView: ViRulerHelperView {
             digitSettings = DigitSettings(digitView: self, textAttributes: textAttributes)
             
             updateViewFrame()
-            // TODO needsDisplayInRect
-            needsDisplay = true
-        }
-    }
-    
-    // FIXME Must we?
-    // We override this because due to how we do drawing here, simply
-    // saying the line numbers need display isn't enough; we need to
-    // tell the ruler view it needs display as well.
-    override var needsDisplay: Bool {
-        didSet {
-            superview?.needsDisplay = needsDisplay
         }
     }
 
@@ -145,13 +131,12 @@ class ViLineNumberView: ViRulerHelperView {
         ]
     }
     
-    @objc func textStorageDidChangeLines(notification: NSNotification) {
+    @objc override func textStorageDidChangeLines(notification: NSNotification) {
         let linesRemoved: Int = notification.userInfo?.typedGet("linesRemoved") ?? 0
         let linesAdded: Int = notification.userInfo?.typedGet("linesAdded") ?? 0
         
         if linesAdded - linesRemoved > 0 {
             updateViewFrame()
-            needsDisplay = true
         }
     }
     
@@ -223,20 +208,37 @@ class ViLineNumberView: ViRulerHelperView {
             
             let digitWidth = digitSize.width
             
-            let lineCount = textStorage.lineCount()
-            let maxLineDigits = log10(CGFloat(lineCount)) + 1
+            var lineCount = textStorage.lineCount()
+            var maxLineDigits = 0
+            repeat {
+                maxLineDigits++
+                lineCount /= 10
+            } while lineCount > 0
             
             return ceil(
                 max(
                     ViLineNumberView.defaultThickness,
-                    (digitWidth * maxLineDigits) + (ViLineNumberView.lineNumberMargin * 2.0)
+                    (digitWidth * CGFloat(maxLineDigits)) + (ViLineNumberView.lineNumberMargin * 2.0)
                 )
             )
         }
     }
     
     private func updateViewFrame() {
-        setFrameSize(NSMakeSize(requiredThickness, textView.bounds.size.height))
+        setFrameSize(intrinsicContentSize)
+        invalidateIntrinsicContentSize()
+    }
+    
+    override var intrinsicContentSize: NSSize {
+        get {
+            return NSSize(width: requiredThickness, height: textView.bounds.size.height)
+        }
+    }
+    
+    override var flipped: Bool {
+        get {
+            return true
+        }
     }
     
     private func drawString(string: String, intoImage image: NSImage) -> NSImage {
@@ -251,22 +253,32 @@ class ViLineNumberView: ViRulerHelperView {
         return image
     }
     
-    private func drawLineNumber(number: Int, inRect rect: NSRect) {
+    private func drawLineNumber(number: Int, atPoint point: NSPoint) {
+        var reverseDigits = [Int]()
         var remainingDigits = abs(number)
-        
-        var drawRect = rect
         repeat {
-            let remainder = remainingDigits % 10
+            reverseDigits.append(remainingDigits % 10)
             remainingDigits /= 10
-            
-            drawRect = drawRect.rectByOffsetting(dx: -digitSize.width, dy: 0)
-            digits[remainder].drawInRect(drawRect,
+        } while remainingDigits > 0
+        
+        let drawRect =
+            NSRect(
+                origin: point,
+                size: digitSize
+            ).offsetBy(
+                dx: requiredThickness - digitSize.width,
+                dy: 0
+            )
+        let _ = reverseDigits.reduce(drawRect, combine: { (drawRect, digit) in
+            digits[digit].drawInRect(drawRect,
                 fromRect: NSZeroRect,
                 operation: NSCompositingOperation.CompositeSourceOver,
                 fraction: 1.0,
                 respectFlipped: true,
                 hints: nil)
-        } while remainingDigits > 0
+            
+            return drawRect.offsetBy(dx: -digitSize.width, dy: 0)
+        })
     }
     
     // Return a function that, given the current line number and current
@@ -295,6 +307,12 @@ class ViLineNumberView: ViRulerHelperView {
         }
     }
     
+    override func drawRect(dirtyRect: NSRect) {
+        let visibleRect = ((superview as? ViRulerView)?.scrollView?.contentView.bounds) ?? dirtyRect
+        
+        drawInRect(dirtyRect, visibleRect: visibleRect)
+    }
+    
     func drawInRect(rect: NSRect, visibleRect: NSRect) {
         if let layoutManager = textView.layoutManager,
             textContainer = textView.textContainer,
@@ -310,15 +328,8 @@ class ViLineNumberView: ViRulerHelperView {
                 if firstCharacterIndex >= lastCharacterIndex {
                     // Draw line number "0" in empty documents.
                     let yFor0 = textView.textContainerInset.height - NSMinY(visibleRect)
-                    
-                    let rectFor0 = NSRect(
-                        x: bounds.width - ViLineNumberView.lineNumberMargin,
-                        y: yFor0 + 2.0,
-                        width: digitSize.width,
-                        height: digitSize.height
-                    )
 
-                    drawLineNumber(0, inRect: rectFor0)
+                    drawLineNumber(0, atPoint: NSPoint(x: 0, y: yFor0 + 2.0))
                     return
                 }
                 
@@ -333,16 +344,14 @@ class ViLineNumberView: ViRulerHelperView {
                     let attributesAtLineStart = textStorage.attributesAtIndex(UInt(currentCharacterIndex), effectiveRange: nil)
                     if attributesAtLineStart[ViFoldedAttributeName] == nil {
                         let yForLineNumber = textView.textContainerInset.height + NSMinY(lineRect) - NSMinY(visibleRect)
-                        
-                        let rectForLineNumber = NSRect(
-                            x: bounds.width - ViLineNumberView.lineNumberMargin,
-                            y: floor(yForLineNumber + (lineRect.height - digitSize.height) / 2.0 + 1.0),
-                            width: digitSize.width,
-                            height: digitSize.height
+                       
+                        let pointForLineNumber = NSPoint(
+                            x: 0,
+                            y: floor(yForLineNumber + (lineRect.height - digitSize.height) / 2.0 + 1.0)
                         )
                         
                         let numberToDraw = relative ? getNextLogicalLine(currentLineNumber, currentCharacterIndex) : Int(currentLineNumber)
-                        drawLineNumber(numberToDraw, inRect: rectForLineNumber)
+                        drawLineNumber(numberToDraw, atPoint: pointForLineNumber)
                     }
                     
                     // Protect against an improbable (but possible due to preceding
@@ -354,6 +363,25 @@ class ViLineNumberView: ViRulerHelperView {
                     textStorageString.getLineStart(nil, end: &currentCharacterIndex, contentsEnd: nil, forRange: NSMakeRange(Int(currentCharacterIndex), 0))
                     currentLineNumber++
                 } while UInt(currentCharacterIndex) < lastCharacterIndex
+        }
+    }
+    
+    private var mouseDownY: CGFloat? = nil
+    
+    override func mouseDown(theEvent: NSEvent) {
+        if let rulerView = self.superview as? NSRulerView {
+            mouseDownY = textView.convertPoint(theEvent.locationInWindow, fromView: nil).y
+            
+            textView.rulerView(rulerView, selectFromPoint: NSPoint(x: 0, y: mouseDownY!), toPoint: NSPoint(x: 0, y: mouseDownY!))
+        }
+    }
+    
+    override func mouseDragged(theEvent: NSEvent) {
+        if let rulerView = self.superview as? NSRulerView,
+            startY = mouseDownY {
+                let toY = textView.convertPoint(theEvent.locationInWindow, fromView: nil).y
+                
+                textView.rulerView(rulerView, selectFromPoint: NSPoint(x: 0, y: startY), toPoint: NSPoint(x: 0, y: toY))
         }
     }
 }

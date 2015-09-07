@@ -115,7 +115,7 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
                                                 forKeyPath:@"theme"
                                                    options:NSKeyValueObservingOptionNew
                                                    context:NULL];
-	}
+    }
 
 	DEBUG_INIT();
 	return self;

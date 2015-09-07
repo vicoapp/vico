@@ -30,6 +30,7 @@
 		178EAF3A1B40A578008C7BA1 /* Dictionary-typedAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF391B40A578008C7BA1 /* Dictionary-typedAccess.swift */; };
 		179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */; };
 		179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */; };
+		17A063871B9D287E0007AD5A /* ViRulerHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */; settings = {ASSET_TAGS = (); }; };
 		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
 		17BA92AD1840440000B1252E /* ViLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17BA92AC1840440000B1252E /* ViLineNumberView.m */; };
 		17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
@@ -480,6 +481,7 @@
 		178EAF391B40A578008C7BA1 /* Dictionary-typedAccess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary-typedAccess.swift"; sourceTree = "<group>"; };
 		179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViTextAttribute.swift; sourceTree = "<group>"; };
 		179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViGlyphGenerator.swift; path = "Text Rendering/ViGlyphGenerator.swift"; sourceTree = "<group>"; };
+		17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRulerHelperView.swift; path = Ruler/ViRulerHelperView.swift; sourceTree = "<group>"; };
 		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
 		17A38DF018405E5200C44D50 /* ViFoldMarginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFoldMarginView.m; sourceTree = "<group>"; };
 		17BA92AB1840440000B1252E /* ViLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViLineNumberView.h; sourceTree = "<group>"; };
@@ -1085,6 +1087,8 @@
 				178EAF331B407072008C7BA1 /* ViRulerView.swift */,
 				178EAF351B407481008C7BA1 /* ViRulerHelper.swift */,
 				178EAF371B4094B9008C7BA1 /* ViLineNumberView.swift */,
+				17B1FB9A1B9B8BC300477C92 /* ViFoldMarginView.swift */,
+				17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */,
 			);
 			name = Ruler;
 			sourceTree = "<group>";
@@ -2188,6 +2192,7 @@
 				179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */,
 				179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */,
 				9A2EF4D1133115280023C5B7 /* iso8859_7.c in Sources */,
+				17A063871B9D287E0007AD5A /* ViRulerHelperView.swift in Sources */,
 				9A2EF4D2133115280023C5B7 /* iso8859_8.c in Sources */,
 				9A2EF4D3133115290023C5B7 /* iso8859_9.c in Sources */,
 				9A2EF4D4133115290023C5B7 /* iso8859_10.c in Sources */,

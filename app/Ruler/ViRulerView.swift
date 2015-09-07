@@ -9,6 +9,8 @@
 import Foundation
 
 class ViRulerView: NSRulerView {
+    static let rerenderingDocumentNotifications = [ViFoldsChangedNotification, ViFoldOpenedNotification, ViFoldClosedNotification]
+    
     private let backgroundColor =
         NSColor(
             deviceRed: (0xED / 0xFF) as CGFloat,
@@ -31,7 +33,7 @@ class ViRulerView: NSRulerView {
                     object: textView)
                 
                 if newValue?.document != textView.document {
-                    for notification in ViLineNumberView.rerenderingDocumentNotifications {
+                    for notification in ViRulerView.rerenderingDocumentNotifications {
                         NSNotificationCenter.defaultCenter().removeObserver(self,
                             name: notification,
                             object: textView.document)

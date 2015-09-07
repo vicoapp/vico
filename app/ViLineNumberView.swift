@@ -38,52 +38,32 @@ private struct DigitSettings {
 /**
  * A helper view that provides line number rendering for `ViRulerView`.
  */
-class ViLineNumberView: NSView {
+class ViLineNumberView: ViRulerHelperView {
     static let defaultThickness: CGFloat = 22.0
     static let lineNumberMargin: CGFloat = 5.0
-    static let rerenderingDocumentNotifications = [ViFoldsChangedNotification, ViFoldOpenedNotification, ViFoldClosedNotification]
     
     private let lineNumberColor = NSColor(calibratedWhite: 0.42, alpha: 1.0)
     
     internal let backgroundColor: NSColor
-    private var _textView: ViTextView? = nil
-    internal var textView: ViTextView {
+
+    override internal var textView: ViTextView {
         set(newValue) {
+            // Some nasty work here because the text view actually isn't
+            // set before we deal with it here the first time, but this
+            // property is non-optional so it will blow up if we try to
+            // use didSet/willSet.
+
             let oldValue = _textView
-            _textView = newValue
+
+            super.textView = newValue
 
             let notificationCenter = NSNotificationCenter.defaultCenter()
-            
-            if oldValue?.document !== newValue.document {
-                if let oldDocument = oldValue?.document {
-                    for notification in ViLineNumberView.rerenderingDocumentNotifications {
-                        notificationCenter.removeObserver(self, name: notification, object: oldDocument)
-                    }
-                }
-                
-                let needsDisplayHandler: (NSNotification!)->Void = { [unowned self] (_) in
-                    self.needsDisplay = true
-                }
-                
-                for notification in ViLineNumberView.rerenderingDocumentNotifications {
-                    notificationCenter.addObserverForName(notification, object: newValue.document, queue: nil, usingBlock: needsDisplayHandler)
-                }
-            }
-
-            if oldValue?.textStorage !== newValue.textStorage {
-                if let oldTextStorage = oldValue?.textStorage {
-                    notificationCenter.removeObserver(self, name: ViTextStorageChangedLinesNotification, object: oldTextStorage)
-                }
-                
-                notificationCenter.addObserver(self, selector: "textStorageDidChangeLines:", name: ViTextStorageChangedLinesNotification, object: newValue.textStorage)
-            }
-
             if oldValue !== newValue {
                 notificationCenter.removeObserver(self, name: ViCaretChangedNotification, object: oldValue)
 
-                notificationCenter.addObserverForName(ViCaretChangedNotification, object: newValue, queue: nil) { [unowned self] (_) in
-                    if self.relative {
-                        self.needsDisplay = true
+                notificationCenter.addObserverForName(ViCaretChangedNotification, object: newValue, queue: nil) { [weak self] (_) in
+                    if let view = self where view.relative {
+                        view.needsDisplay = true
                     }
                 }
             }

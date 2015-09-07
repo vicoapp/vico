@@ -32,6 +32,7 @@
 		179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */; };
 		17A063871B9D287E0007AD5A /* ViRulerHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */; settings = {ASSET_TAGS = (); }; };
 		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
+		17B1FB9B1B9B8BC300477C92 /* ViFoldMarginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B1FB9A1B9B8BC300477C92 /* ViFoldMarginView.swift */; };
 		17BA92AD1840440000B1252E /* ViLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17BA92AC1840440000B1252E /* ViLineNumberView.m */; };
 		17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
 		17D8A10417C842B7000C25C6 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */; };
@@ -484,6 +485,7 @@
 		17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRulerHelperView.swift; path = Ruler/ViRulerHelperView.swift; sourceTree = "<group>"; };
 		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
 		17A38DF018405E5200C44D50 /* ViFoldMarginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFoldMarginView.m; sourceTree = "<group>"; };
+		17B1FB9A1B9B8BC300477C92 /* ViFoldMarginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViFoldMarginView.swift; path = Ruler/ViFoldMarginView.swift; sourceTree = "<group>"; };
 		17BA92AB1840440000B1252E /* ViLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViLineNumberView.h; sourceTree = "<group>"; };
 		17BA92AC1840440000B1252E /* ViLineNumberView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViLineNumberView.m; sourceTree = "<group>"; };
 		17D8A0FC17C842B7000C25C6 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJson.h; path = json/SBJson.h; sourceTree = SOURCE_ROOT; };
@@ -2233,6 +2235,7 @@
 				9A260674134DF8D7002C86FB /* ViCompletion.m in Sources */,
 				9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */,
 				9A2606AC135B1924002C86FB /* ViPreferencePane.m in Sources */,
+				17B1FB9B1B9B8BC300477C92 /* ViFoldMarginView.swift in Sources */,
 				9A2606AD135B1924002C86FB /* ViPreferencePaneGeneral.m in Sources */,
 				9A2606AE135B1924002C86FB /* ViPreferencePaneTheme.m in Sources */,
 				9A2606B1135B1C4F002C86FB /* ViPreferencePaneBundles.m in Sources */,

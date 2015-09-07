@@ -32,7 +32,7 @@ extension ViRulerHelper where Self: NSView {
     }
 }
 
-//extension ViFoldMarginView: ViRulerHelper {}
+extension ViFoldMarginView: ViRulerHelper {}
 extension ViLineNumberView: ViRulerHelper {}
 
 internal func helpersForTextView(textView: ViTextView, backgroundColor: NSColor) -> [ViRulerHelper] {

@@ -2,7 +2,7 @@
 
 #import "ViFold.h"
 #import "ViTextView.h"
-
+/*
 #define FOLD_MARGIN_WIDTH 10
 
 @implementation ViFoldMarginView
@@ -41,6 +41,9 @@
 
 	_textView = aTextView;
 }
+- (ViTextView *)textView {
+    return _textView;
+}
 
 - (void)textStorageDidChangeLines:(NSNotification *)notification
 {
@@ -73,7 +76,7 @@
 	[self setFrameSize:NSMakeSize(FOLD_MARGIN_WIDTH, _textView.bounds.size.height)];
 }
 
-- (void)drawFoldsInRect:(NSRect)aRect visibleRect:(NSRect)visibleRect
+- (void)drawInRect:(NSRect)aRect visibleRect:(NSRect)visibleRect
 {
 	NSLayoutManager         *layoutManager;
 	NSTextContainer         *container;
@@ -122,10 +125,10 @@
 			NSRectFillUsingOperation(r, NSCompositeSourceOver);
 		}
 
-		/* Protect against an improbable (but possible due to
+		* Protect against an improbable (but possible due to
 		 * preceeding exceptions in undo manager) out-of-bounds
 		 * reference here.
-		 */
+		 *
 		if (location >= [textStorage length]) {
 			break;
 		}
@@ -146,3 +149,4 @@
 }
 
 @end
+*/

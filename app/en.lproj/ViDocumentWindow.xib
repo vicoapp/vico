@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8187.4" systemVersion="14E46" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8187.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ViWindowController">
@@ -42,6 +42,7 @@
                     <customView id="100591" customClass="PSMTabBarControl">
                         <rect key="frame" x="0.0" y="578" width="800" height="22"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                        <animations/>
                         <connections>
                             <outlet property="delegate" destination="-2" id="100606"/>
                             <outlet property="partnerView" destination="100151" id="100729"/>
@@ -63,6 +64,7 @@
                                             <tabView drawsBackground="NO" type="noTabsNoBorder" id="100593" userLabel="Editor Tab View">
                                                 <rect key="frame" x="0.0" y="23" width="800" height="555"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <animations/>
                                                 <font key="font" metaFont="system"/>
                                                 <tabViewItems/>
                                                 <connections>
@@ -72,11 +74,13 @@
                                             <imageView id="100594">
                                                 <rect key="frame" x="0.0" y="0.0" width="800" height="23"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                <animations/>
                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="actionbarbg" id="100602"/>
                                             </imageView>
                                             <popUpButton id="100651">
                                                 <rect key="frame" x="0.0" y="0.0" width="31" height="23"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <animations/>
                                                 <popUpButtonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="overlaps" alignment="left" lineBreakMode="truncatingTail" borderStyle="bezel" inset="2" pullsDown="YES" arrowPosition="noArrow" preferredEdge="maxY" id="100652" customClass="ViToolbarPopUpButtonCell" customModule="Vico">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="menu"/>
@@ -86,6 +90,7 @@
                                             <textField hidden="YES" focusRingType="none" verticalHuggingPriority="750" id="100595" userLabel="ex command line" customClass="ExTextField">
                                                 <rect key="frame" x="31" y="2.5" width="766" height="20"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                <animations/>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" focusRingType="none" drawsBackground="YES" id="100601">
                                                     <font key="font" size="10" name="Monaco"/>
                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -98,12 +103,16 @@
                                             <customView autoresizesSubviews="NO" id="100774" customClass="ViStatusView">
                                                 <rect key="frame" x="36" y="4" width="758" height="14"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                <animations/>
                                             </customView>
                                         </subviews>
+                                        <animations/>
                                     </customView>
                                 </subviews>
+                                <animations/>
                             </customView>
                         </subviews>
+                        <animations/>
                         <holdingPriorities>
                             <real value="250"/>
                         </holdingPriorities>
@@ -112,6 +121,7 @@
                         </connections>
                     </splitView>
                 </subviews>
+                <animations/>
             </view>
             <toolbar key="toolbar" implicitIdentifier="4D9B28D8-A177-4086-91E8-A53904734D79" displayMode="iconAndLabel" sizeMode="regular" id="100407" userLabel="Toolbar">
                 <allowedToolbarItems>
@@ -124,6 +134,7 @@
                         <popUpButton key="view" verticalHuggingPriority="750" tag="101" id="100461">
                             <rect key="frame" x="0.0" y="14" width="200" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <animations/>
                             <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="100462">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -138,6 +149,7 @@
                         <button key="view" verticalHuggingPriority="750" tag="102" id="100474">
                             <rect key="frame" x="19" y="14" width="33" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <animations/>
                             <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="tag" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="100475">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -157,6 +169,7 @@
                         <segmentedControl key="view" verticalHuggingPriority="750" tag="103" id="100515">
                             <rect key="frame" x="0.0" y="14" width="60" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <animations/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="100516">
                                 <font key="font" metaFont="system"/>
                                 <segments>
@@ -176,6 +189,7 @@
                         <button key="view" verticalHuggingPriority="750" tag="104" id="100540">
                             <rect key="frame" x="9" y="14" width="33" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <animations/>
                             <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="NSRevealFreestandingTemplate" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="100541">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -192,6 +206,7 @@
                         <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" id="100714">
                             <rect key="frame" x="0.0" y="14" width="144" height="22"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <animations/>
                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" allowsUndo="NO" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsSearchStringImmediately="YES" recentsAutosaveName="" id="100715">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -210,6 +225,7 @@
                         <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" id="100719">
                             <rect key="frame" x="0.0" y="14" width="150" height="22"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <animations/>
                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" borderStyle="bezel" bezelStyle="round" sendsSearchStringImmediately="YES" id="100720">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -272,6 +288,7 @@
                             <outlineView focusRingType="none" appearanceType="vibrantLight" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" autosaveName="symbolsOutline" rowHeight="20" indentationPerLevel="14" autoresizesOutlineColumn="YES" outlineTableColumn="100266" id="100264" customClass="ViOutlineView">
                                 <rect key="frame" x="0.0" y="0.0" width="150" height="20"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <animations/>
                                 <size key="intercellSpacing" width="3" height="0.0"/>
                                 <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -296,30 +313,37 @@
                                 </connections>
                             </outlineView>
                         </subviews>
+                        <animations/>
                         <nil key="backgroundColor"/>
                     </clipView>
+                    <animations/>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="100263">
                         <rect key="frame" x="-100" y="-100" width="225" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <animations/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="100262">
                         <rect key="frame" x="156" y="0.0" width="15" height="440"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <animations/>
                     </scroller>
                 </scrollView>
                 <imageView id="100259">
                     <rect key="frame" x="15" y="0.0" width="135" height="23"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="actionbarbg" id="100260"/>
                 </imageView>
                 <imageView id="100257">
                     <rect key="frame" x="0.0" y="0.0" width="15" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="resizehandle" id="100258"/>
                 </imageView>
                 <searchField hidden="YES" verticalHuggingPriority="750" id="100753" userLabel="Alternative Filter Field">
                     <rect key="frame" x="1" y="464" width="148" height="22"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <animations/>
                     <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsSearchStringImmediately="YES" id="100754">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -331,6 +355,7 @@
                     </connections>
                 </searchField>
             </subviews>
+            <animations/>
         </customView>
         <menu id="100325" userLabel="Explorer Menu">
             <items>
@@ -441,6 +466,7 @@
                 <popUpButton id="100642">
                     <rect key="frame" x="0.0" y="0.0" width="31" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <popUpButtonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="overlaps" alignment="left" lineBreakMode="truncatingTail" borderStyle="bezel" inset="2" pullsDown="YES" arrowPosition="noArrow" preferredEdge="maxY" id="100643" customClass="ViToolbarPopUpButtonCell" customModule="Vico">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
@@ -450,16 +476,19 @@
                 <imageView id="100352">
                     <rect key="frame" x="135" y="0.0" width="15" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="resizehandle" id="100357"/>
                 </imageView>
                 <imageView id="100353">
                     <rect key="frame" x="31" y="0.0" width="104" height="23"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="actionbarbg" id="100356"/>
                 </imageView>
                 <pathControl focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" id="100764">
                     <rect key="frame" x="30" y="0.0" width="107" height="20"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <pathCell key="cell" controlSize="small" selectable="YES" editable="YES" refusesFirstResponder="YES" focusRingType="none" alignment="left" pathStyle="navigationBar" id="100765" customClass="ViPathCell">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="backgroundColor" red="0.52156865600000002" green="0.52156865600000002" blue="0.52156865600000002" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -475,6 +504,7 @@
                             <outlineView focusRingType="none" appearanceType="vibrantLight" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" autosaveColumns="NO" typeSelect="NO" rowHeight="20" indentationPerLevel="16" outlineTableColumn="100362" id="100359" customClass="ViOutlineView">
                                 <rect key="frame" x="0.0" y="0.0" width="150" height="20"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <animations/>
                                 <size key="intercellSpacing" width="3" height="0.0"/>
                                 <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -485,7 +515,7 @@
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                         </tableHeaderCell>
-                                        <textFieldCell key="dataCell" lineBreakMode="truncatingHead" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="100363" customClass="MHTextIconCell">
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingHead" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="100363" customClass="ViTextIconCell" customModule="Vico" customModuleProvider="target">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -500,24 +530,30 @@
                                 </connections>
                             </outlineView>
                         </subviews>
+                        <animations/>
                         <nil key="backgroundColor"/>
                     </clipView>
+                    <animations/>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="100360">
                         <rect key="frame" x="1" y="324" width="316" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <animations/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="100361">
                         <rect key="frame" x="317" y="0.0" width="15" height="324"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <animations/>
                     </scroller>
                 </scrollView>
                 <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="100709">
                     <rect key="frame" x="39" y="3" width="16" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <animations/>
                 </progressIndicator>
                 <searchField hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" id="100747" userLabel="Alternative Filter Field">
                     <rect key="frame" x="1" y="364" width="148" height="22"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <animations/>
                     <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsSearchStringImmediately="YES" id="100748">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -529,6 +565,7 @@
                     </connections>
                 </searchField>
             </subviews>
+            <animations/>
         </customView>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="100398" userLabel="SFTPConfig">
             <windowStyleMask key="styleMask" titled="YES"/>
@@ -542,6 +579,7 @@
                     <form verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="100384">
                         <rect key="frame" x="20" y="60" width="342" height="82"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <animations/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         <size key="cellSize" width="342" height="22"/>
                         <size key="intercellSpacing" width="1" height="8"/>
@@ -569,6 +607,7 @@
                     <button verticalHuggingPriority="750" id="100389">
                         <rect key="frame" x="276" y="12" width="92" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <animations/>
                         <buttonCell key="cell" type="push" title="Connect" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="100390">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -583,6 +622,7 @@ DQ
                     <button verticalHuggingPriority="750" id="100391">
                         <rect key="frame" x="194" y="12" width="82" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <animations/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="100392">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -597,6 +637,7 @@ Gw
                     <textField verticalHuggingPriority="750" id="100393">
                         <rect key="frame" x="17" y="150" width="242" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <animations/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Connect to a remote host using SFTP:" id="100394">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -604,6 +645,7 @@ Gw
                         </textFieldCell>
                     </textField>
                 </subviews>
+                <animations/>
             </view>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="100488"/>

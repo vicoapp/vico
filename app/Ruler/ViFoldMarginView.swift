@@ -28,6 +28,10 @@ class ViFoldMarginView: ViRulerHelperView {
         let userDefaults = NSUserDefaults.standardUserDefaults()
         userDefaults.addObserver(self, forKeyPath: "fontsize", options: NSKeyValueObservingOptions(), context: nil)
     }
+
+    deinit {
+        NSUserDefaults.standardUserDefaults().removeObserver(self, forKeyPath: "fontsize")
+    }
     
     @objc override func textStorageDidChangeLines(notification: NSNotification) {
         let linesRemoved: Int = notification.userInfo?.typedGet("linesRemoved") ?? 0

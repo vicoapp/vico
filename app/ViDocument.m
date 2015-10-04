@@ -1616,10 +1616,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	NSRange r = NSMakeRange(0, [_textStorage length]);
 	[_textStorage setAttributes:_typingAttributes range:r];
-
-	[self eachTextView:^(ViTextView *tv) {
-		[(ViRulerView *)[[tv enclosingScrollView] verticalRulerView] resetTextAttributes];
-	}];
 }
 
 - (void)changeTheme:(ViTheme *)aTheme

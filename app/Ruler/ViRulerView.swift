@@ -130,8 +130,4 @@ class ViRulerView: NSRulerView {
             helperView.needsDisplay = true
         }
     }
-    
-    func resetTextAttributes() {
-        NSLog("Shouldn't be resetting text attributes on the ruler view.")
-    }
 }

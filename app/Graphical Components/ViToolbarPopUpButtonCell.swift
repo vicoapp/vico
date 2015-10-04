@@ -8,6 +8,13 @@
 
 import Foundation
 
+/**
+ * By default, NSPopUpButtonCells display the image and text of their
+ * first menu item. We want to be able to give some pop up buttons an
+ * icon independent of their menu items, which are all generated. This
+ * class restores the ability of the popup button cell to have its own
+ * image, and to draw that image in the popup button's area.
+ */
 class ViToolbarPopUpButtonCell: NSPopUpButtonCell {
     
     private var toolbarImage: NSImage?
@@ -16,17 +23,18 @@ class ViToolbarPopUpButtonCell: NSPopUpButtonCell {
             return toolbarImage
         }
         set {
-            if let newImage = newValue {
-                let flippedImage = NSImage(size: newImage.size)
-                
-                flippedImage.lockFocusFlipped(true)
-                newImage.drawAtPoint(NSZeroPoint, fromRect: newImage.fullRect(), operation: NSCompositingOperation.CompositeSourceOver, fraction: 1.0)
-                flippedImage.unlockFocus()
-                
-                toolbarImage = flippedImage
-            } else {
-                toolbarImage = nil
-            }
+            toolbarImage = newValue
+        }
+    }
+    
+    override func drawInteriorWithFrame(cellFrame: NSRect, inView controlView: NSView) {
+        if let buttonImage = toolbarImage {
+            let imageSize = buttonImage.size
+            let imageOrigin =
+            NSPoint(x: (cellFrame.size.width - imageSize.width) / 2,
+                y: (cellFrame.size.height - imageSize.height) / 2)
+            
+            image?.drawInRect(NSRect(origin: imageOrigin, size: imageSize))
         }
     }
 }

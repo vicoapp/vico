@@ -47,11 +47,11 @@
 
 - (id)init
 {
-	_preferences = [[NSMutableSet alloc] init];
-
 	self = [super initWithNibName:@"EditPrefs"
 				 name:@"Editing"
 				 icon:[NSImage imageNamed:NSImageNameMultipleDocuments]];
+    
+    _preferences = [[NSMutableSet alloc] init];
 
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	NSDictionary *prefs = [defs dictionaryForKey:@"scopedPreferences"];

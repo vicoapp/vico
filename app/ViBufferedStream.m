@@ -396,7 +396,7 @@ fd_read(CFSocketRef s,
 	struct sockaddr_un addr;
 	struct addrinfo hints;
 	struct addrinfo *ai, *ai0;
-	int res, fd;
+	int res, fd = -1;
 
 	if (family == AF_UNSPEC && [node hasPrefix:@"/"]) {
 		family = AF_UNIX;
@@ -499,7 +499,10 @@ fd_read(CFSocketRef s,
 			INFO(@"fd %i has %lu non-flushed buffers pending", _fd_out, [_outputBuffers count]);
 		}
 		CFSocketInvalidate(_outputSocket); /* also removes the source from run loops */
-		CFRelease(_outputSocket);
+        
+        if (_outputSocket) {
+            CFRelease(_outputSocket);
+        }
 		CFRelease(_outputSource);
 		_outputSocket = NULL;
 		_outputSource = NULL;
@@ -541,11 +544,12 @@ fd_read(CFSocketRef s,
 
 - (void)scheduleInRunLoop:(NSRunLoop *)aRunLoop forMode:(NSString *)mode
 {
+    
 	DEBUG(@"adding to mode %@", mode);
 	if (_inputSource)
-		CFRunLoopAddSource([aRunLoop getCFRunLoop], _inputSource, (CFStringRef)CFBridgingRetain(mode));
+		CFRunLoopAddSource([aRunLoop getCFRunLoop], _inputSource, (__bridge CFStringRef)mode);
 	if (_outputSource)
-		CFRunLoopAddSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)CFBridgingRetain(mode));
+		CFRunLoopAddSource([aRunLoop getCFRunLoop], _outputSource, (__bridge CFStringRef)mode);
 }
 
 - (void)schedule
@@ -557,9 +561,9 @@ fd_read(CFSocketRef s,
 {
 	DEBUG(@"removing from mode %@", mode);
 	if (_inputSource)
-		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _inputSource, (CFStringRef)CFBridgingRetain(mode));
+		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _inputSource, (__bridge CFStringRef)mode);
 	if (_outputSource)
-		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)CFBridgingRetain(mode));
+		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _outputSource, (__bridge CFStringRef)mode);
 }
 
 - (BOOL)getBuffer:(const void **)buf length:(NSUInteger *)len

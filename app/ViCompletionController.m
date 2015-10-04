@@ -243,11 +243,6 @@
 		return NO;
 	}
 
-	NSInteger initialSelectionIndex = 0;
-	if (!_positionCompletionsBelowPrefix) {
-		initialSelectionIndex = [self numberOfRowsInTableView:tableView] - 1;
-	}
-
 	[self updateUIForPrefixWindow:parentWindow];
 
 	[parentWindow addChildWindow:window ordered:NSWindowAbove];

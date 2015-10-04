@@ -64,7 +64,7 @@
 	[symbolView setDoubleAction:@selector(gotoSymbolAction:)];
 	[symbolView setAction:@selector(gotoSymbolAction:)];
 
-	NSCell *cell = [[ViTextIconCell alloc] init];
+	NSCell *cell = [[MHTextIconCell alloc] init];
 	[[symbolView outlineTableColumn] setDataCell:cell];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];

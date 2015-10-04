@@ -515,7 +515,7 @@
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                         </tableHeaderCell>
-                                        <textFieldCell key="dataCell" lineBreakMode="truncatingHead" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="100363" customClass="ViTextIconCell" customModule="Vico" customModuleProvider="target">
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingHead" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="100363" customClass="MHTextIconCell">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>

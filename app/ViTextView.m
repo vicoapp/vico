@@ -24,6 +24,9 @@
  */
 
 #import "ViTextView.h"
+
+#import "Vico-Swift.h"
+
 #import "ViBundleStore.h"
 #import "ViThemeStore.h"
 #import "ViDocument.h"  // for declaration of the message: method
@@ -41,7 +44,6 @@
 #import "ViError.h"
 #import "ViFold.h"
 #import "ViRegisterManager.h"
-#import "ViLayoutManager.h"
 #import "NSView-additions.h"
 #import "ViPreferencePaneEdit.h"
 #import "ViTaskRunner.h"
@@ -348,7 +350,7 @@ DEBUG_FINALIZE();
 		ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]];
 		[self setTheme:theme];
 		ViLayoutManager *lm = (ViLayoutManager *)[self layoutManager];
-		[lm setInvisiblesAttributes:[theme invisiblesAttributes]];
+		[lm setAttributesForInvisibles:[theme invisiblesAttributes]];
 		[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [[self textStorage] length])];
 	} else if ([keyPath isEqualToString:@"cursorline"]) {
 		_highlightCursorLine = [defaults boolForKey:keyPath];

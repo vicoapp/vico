@@ -25,7 +25,6 @@
 
 #import "ViTagsDatabase.h"
 #import "ViJumpList.h"
-#import "ViToolbarPopUpButtonCell.h"
 #import "ViSymbolController.h"
 #import "ViStatusView.h"
 #import "ViURLManager.h"
@@ -35,6 +34,7 @@
 
 #define ViWindowDidLoad @"ViWindowDidLoad"
 
+@class ViToolbarPopUpButtonCell;
 @class PSMTabBarControl;
 @class ViDocument;
 @class ViDocumentView;

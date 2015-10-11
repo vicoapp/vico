@@ -37,16 +37,16 @@
 #import "ViAppController.h"
 #import "ViTextStorage.h"
 #import "NSObject+SPInvocationGrabbing.h"
-#import "ViLayoutManager.h"
 #import "ExTextField.h"
 #import "ViEventManager.h"
-#import "ViRulerView.h"
 #import "NSURL-additions.h"
 #import "ExCommand.h"
 #import "ViError.h"
 #import "ViBgView.h"
 #import "ViMark.h"
 #import "NSWindow-additions.h"
+
+#import "Vico-Swift.h"
 
 static NSMutableArray			*__windowControllers = nil;
 static __weak ViWindowController	*__currentWindowController = nil; // XXX: not retained!
@@ -114,7 +114,7 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
                                                 forKeyPath:@"theme"
                                                    options:NSKeyValueObservingOptionNew
                                                    context:NULL];
-	}
+    }
 
 	DEBUG_INIT();
 	return self;

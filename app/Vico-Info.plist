@@ -302,7 +302,7 @@
 	<key>CFBundleIconFile</key>
 	<string>vico.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>se.bzero.Vico</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

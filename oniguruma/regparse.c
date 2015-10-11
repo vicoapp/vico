@@ -426,7 +426,7 @@ i_print_name_entry(UChar* key, NameEntry* e, void* arg)
 }
 
 extern int
-onig_print_names(FILE* fp, regex_t* reg)
+onig_print_names(FILE* fp, OnigRegexType* reg)
 {
   NameTable* t = (NameTable* )reg->name_table;
 
@@ -450,7 +450,7 @@ i_free_name_entry(UChar* key, NameEntry* e, void* arg ARG_UNUSED)
 }
 
 static int
-names_clear(regex_t* reg)
+names_clear(OnigRegexType* reg)
 {
   NameTable* t = (NameTable* )reg->name_table;
 
@@ -461,7 +461,7 @@ names_clear(regex_t* reg)
 }
 
 extern int
-onig_names_free(regex_t* reg)
+onig_names_free(OnigRegexType* reg)
 {
   int r;
   NameTable* t;
@@ -476,7 +476,7 @@ onig_names_free(regex_t* reg)
 }
 
 static NameEntry*
-name_find(regex_t* reg, const UChar* name, const UChar* name_end)
+name_find(OnigRegexType* reg, const UChar* name, const UChar* name_end)
 {
   NameEntry* e;
   NameTable* t = (NameTable* )reg->name_table;
@@ -489,8 +489,8 @@ name_find(regex_t* reg, const UChar* name, const UChar* name_end)
 }
 
 typedef struct {
-  int (*func)(const UChar*, const UChar*,int,int*,regex_t*,void*);
-  regex_t* reg;
+  int (*func)(const UChar*, const UChar*,int,int*,OnigRegexType*,void*);
+  OnigRegexType* reg;
   void* arg;
   int ret;
   OnigEncoding enc;
@@ -512,8 +512,8 @@ i_names(UChar* key ARG_UNUSED, NameEntry* e, INamesArg* arg)
 }
 
 extern int
-onig_foreach_name(regex_t* reg,
-  int (*func)(const UChar*, const UChar*,int,int*,regex_t*,void*), void* arg)
+onig_foreach_name(OnigRegexType* reg,
+  int (*func)(const UChar*, const UChar*,int,int*,OnigRegexType*,void*), void* arg)
 {
   INamesArg narg;
   NameTable* t = (NameTable* )reg->name_table;
@@ -547,7 +547,7 @@ i_renumber_name(UChar* key ARG_UNUSED, NameEntry* e, GroupNumRemap* map)
 }
 
 extern int
-onig_renumber_name_table(regex_t* reg, GroupNumRemap* map)
+onig_renumber_name_table(OnigRegexType* reg, GroupNumRemap* map)
 {
   NameTable* t = (NameTable* )reg->name_table;
 
@@ -559,7 +559,7 @@ onig_renumber_name_table(regex_t* reg, GroupNumRemap* map)
 
 
 extern int
-onig_number_of_names(regex_t* reg)
+onig_number_of_names(OnigRegexType* reg)
 {
   NameTable* t = (NameTable* )reg->name_table;
 
@@ -581,7 +581,7 @@ typedef struct {
 
 #ifdef ONIG_DEBUG
 extern int
-onig_print_names(FILE* fp, regex_t* reg)
+onig_print_names(FILE* fp, OnigRegexType* reg)
 {
   int i, j;
   NameEntry* e;
@@ -613,7 +613,7 @@ onig_print_names(FILE* fp, regex_t* reg)
 #endif
 
 static int
-names_clear(regex_t* reg)
+names_clear(OnigRegexType* reg)
 {
   int i;
   NameEntry* e;
@@ -642,7 +642,7 @@ names_clear(regex_t* reg)
 }
 
 extern int
-onig_names_free(regex_t* reg)
+onig_names_free(OnigRegexType* reg)
 {
   int r;
   NameTable* t;
@@ -657,7 +657,7 @@ onig_names_free(regex_t* reg)
 }
 
 static NameEntry*
-name_find(regex_t* reg, UChar* name, UChar* name_end)
+name_find(OnigRegexType* reg, UChar* name, UChar* name_end)
 {
   int i, len;
   NameEntry* e;
@@ -675,8 +675,8 @@ name_find(regex_t* reg, UChar* name, UChar* name_end)
 }
 
 extern int
-onig_foreach_name(regex_t* reg,
-  int (*func)(const UChar*, const UChar*,int,int*,regex_t*,void*), void* arg)
+onig_foreach_name(OnigRegexType* reg,
+  int (*func)(const UChar*, const UChar*,int,int*,OnigRegexType*,void*), void* arg)
 {
   int i, r;
   NameEntry* e;
@@ -695,7 +695,7 @@ onig_foreach_name(regex_t* reg,
 }
 
 extern int
-onig_number_of_names(regex_t* reg)
+onig_number_of_names(OnigRegexType* reg)
 {
   NameTable* t = (NameTable* )reg->name_table;
 
@@ -708,7 +708,7 @@ onig_number_of_names(regex_t* reg)
 #endif /* else USE_ST_LIBRARY */
 
 static int
-name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
+name_add(OnigRegexType* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
 {
   int alloc;
   NameEntry* e;
@@ -818,7 +818,7 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
 }
 
 extern int
-onig_name_to_group_numbers(regex_t* reg, const UChar* name,
+onig_name_to_group_numbers(OnigRegexType* reg, const UChar* name,
 			   const UChar* name_end, int** nums)
 {
   NameEntry* e = name_find(reg, name, name_end);
@@ -839,7 +839,7 @@ onig_name_to_group_numbers(regex_t* reg, const UChar* name,
 }
 
 extern int
-onig_name_to_backref_number(regex_t* reg, const UChar* name,
+onig_name_to_backref_number(OnigRegexType* reg, const UChar* name,
 			    const UChar* name_end, OnigRegion *region)
 {
   int i, n, *nums;
@@ -865,35 +865,35 @@ onig_name_to_backref_number(regex_t* reg, const UChar* name,
 #else /* USE_NAMED_GROUP */
 
 extern int
-onig_name_to_group_numbers(regex_t* reg, const UChar* name,
+onig_name_to_group_numbers(OnigRegexType* reg, const UChar* name,
 			   const UChar* name_end, int** nums)
 {
   return ONIG_NO_SUPPORT_CONFIG;
 }
 
 extern int
-onig_name_to_backref_number(regex_t* reg, const UChar* name,
+onig_name_to_backref_number(OnigRegexType* reg, const UChar* name,
 			    const UChar* name_end, OnigRegion* region)
 {
   return ONIG_NO_SUPPORT_CONFIG;
 }
 
 extern int
-onig_foreach_name(regex_t* reg,
-  int (*func)(const UChar*, const UChar*,int,int*,regex_t*,void*), void* arg)
+onig_foreach_name(OnigRegexType* reg,
+  int (*func)(const UChar*, const UChar*,int,int*,OnigRegexType*,void*), void* arg)
 {
   return ONIG_NO_SUPPORT_CONFIG;
 }
 
 extern int
-onig_number_of_names(regex_t* reg)
+onig_number_of_names(OnigRegexType* reg)
 {
   return 0;
 }
 #endif /* else USE_NAMED_GROUP */
 
 extern int
-onig_noname_group_capture_is_active(regex_t* reg)
+onig_noname_group_capture_is_active(OnigRegexType* reg)
 {
   if (ONIG_IS_OPTION_ON(reg->options, ONIG_OPTION_DONT_CAPTURE_GROUP))
     return 0;
@@ -5518,7 +5518,7 @@ parse_regexp(Node** top, UChar** src, UChar* end, ScanEnv* env)
 
 extern int
 onig_parse_make_tree(Node** root, const UChar* pattern, const UChar* end,
-		     regex_t* reg, ScanEnv* env)
+		     OnigRegexType* reg, ScanEnv* env)
 {
   int r;
   UChar* p;

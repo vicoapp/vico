@@ -24,13 +24,13 @@
  */
 
 #import "ViRegexp.h"
-#import "ViToolbarPopUpButtonCell.h"
 #import "ViOutlineView.h"
 #import "ViJumpList.h"
 #import "ViFile.h"
 
 #include <CoreServices/CoreServices.h>
 
+@class ViToolbarPopUpButtonCell;
 @class ViWindowController;
 @class ViBgView;
 

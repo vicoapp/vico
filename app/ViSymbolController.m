@@ -25,6 +25,8 @@
 
 #import <Quartz/Quartz.h>
 
+#include <Vico-Swift.h>
+
 #import "ViSymbolController.h"
 #import "MHTextIconCell.h"
 #import "ViSeparatorCell.h"
@@ -656,7 +658,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 		cell  = [tableColumn dataCellForRow:[symbolView rowForItem:item]];
 
 		if ([item respondsToSelector:@selector(icon)])
-			[cell setImage:[item icon]];
+			[cell setImage:(NSImage *)[item icon]];
 		else
 			[cell setImage:nil];
 	}

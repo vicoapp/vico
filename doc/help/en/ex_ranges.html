@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Ex command ranges</title>
+</head>
+<body>
+  <div id="wrapper">
+    <div id="main">
+
+<h1>Ex command ranges</h1>
+
+<p>Many <a href="ex_cmds.html">ex commands</a> accept a range of lines to operate
+upon. The range precede the command name and consists of zero, one or
+two line addresses separated with comma. </p>
+
+<p>A line address can be written as:</p>
+
+<ul>
+<li>an absolute line number, ie <kbd>3</kbd></li>
+<li><kbd>$</kbd> denotes the last line</li>
+<li><kbd>.</kbd> (a dot) referes to the current line</li>
+<li>a mark (eg <kbd>'x</kbd>)</li>
+<li><kbd>%</kbd> denotes all lines, same as <kbd>1,$</kbd></li>
+<li>a forward search pattern, delimited by slashes, eg <kbd>/foo/</kbd></li>
+<li>a backward search pattern, delimited by question marks, eg <kbd>?foo?</kbd></li>
+</ul>
+
+<p>Additionally, a line offset may be appended to a line address with
+<kbd>+</kbd> or <kbd>-</kbd>. For example, <kbd>.+2</kbd> means two
+lines after the current line.</p>
+
+    </div>
+  </div>
+  <footer>
+  </footer>
+</body>
+</html>

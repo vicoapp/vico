@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Terminal usage</title>
+</head>
+<body>
+  <div id="wrapper">
+    <div id="main">
+
+<h1>Terminal usage</h1>
+
+<p><a name="terminalUsage"></a></p>
+
+<p>Vico includes a command line tool that can be used to launch vico from
+the shell.</p>
+
+<p>To use the tool from the command line, create a link from the
+application bundle to a directory in your PATH. If you have a
+<kbd>bin</kbd> directory in your home directory, create it as:</p>
+
+<pre><code>ln -s /Applications/Vico.app/Contents/MacOS/vicotool ~/bin/vico
+</code></pre>
+
+<p>If you want to install it for all users on the machine, create the link
+in a global directory (this requires administrator privileges):</p>
+
+<pre><code>sudo ln -s /Applications/Vico.app/Contents/MacOS/vicotool /usr/local/bin/vico
+</code></pre>
+
+<p>If Vico is not stored in your /Applications folder, adjust the command
+appropriately. Once the link is created, it will be kept up-to-date
+when Vico is updated.</p>
+
+<p>To open a file with Vico from the shell, simply type:</p>
+
+<pre><code>vico filename
+</code></pre>
+
+<p>You can open multiple files at once, also using globbing characters (eg,
+<kbd>vico *.py</kbd>). If you specify a directory, Vico will display a
+new window with the directory selected in the explorer sidebar.</p>
+
+<p>If you want to use Vico in your <kbd>$EDITOR</kbd> variable to edit
+commit messages, you need to use the <kbd>-w</kbd> switch. This makes
+Vico wait until the document is closed to return. The return code from
+vicotool is 0 if the document saved successfully before closing, and
+non-zero if it wasn't saved.</p>
+
+<p>To see a quick description of the command line usage, use the
+<kbd>-h</kbd> option:</p>
+
+<pre><code>$ vico -h
+syntax: vicotool [-hrw] [-e string] [-f file] [-p params] [file ...]
+options:
+    -h            show this help
+    -e string     evaluate the string as a Nu script
+    -f file       read file and evaluate as a Nu script
+    -p params     read script parameters as a JSON string
+    -p -          read script parameters as JSON from standard input
+    -r            enter runloop (don't exit script immediately)
+    -w            wait for document to close
+</code></pre>
+
+    </div>
+  </div>
+  <footer>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Moving by symbols</title>
+</head>
+<body>
+  <div id="wrapper">
+    <div id="main">
+
+<h1>Moving by symbols</h1>
+
+<p>The <kbd>ctrl-]</kbd> key (in normal mode), jumps to the symbol under the caret.</p>
+
+<p>If you have a <a href="http://ctags.sourceforge.net/">tags</a> file, Vico will try to
+lookup the current word as a tag. The <code>tags</code> file should be placed in
+the windows current directory, ie the top-most directory displayed by
+the <a href="explorer.html">explorer</a>.</p>
+
+<p>If no tag was found, Vico tries to match the current word with a
+<a href="symbols.html">symbol</a>. If more than one match is found, you are presented with
+a menu.</p>
+
+<p>If a tag or symbol is found, the current location is pushed on the
+<a href="tagstack.html">tag stack</a>, and the caret is jumped to the new location.
+Press <kbd>ctrl-t</kbd> to go back.</p>
+
+<p>You can also use the <kbd>&#x21E7;&#x2318;T</kbd> key to search the
+<a href="symbols.html">symbol list</a>.</p>
+
+    </div>
+  </div>
+  <footer>
+  </footer>
+</body>
+</html>

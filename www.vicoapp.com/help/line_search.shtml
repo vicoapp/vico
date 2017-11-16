@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Searching within a line</title>
+  <script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-344189-7']);
+  _gaq.push(['_trackPageview']);
+ (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+  
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Searching within a line</h1>
+
+<p>To quickly search for the next or previous occurrance of a character on the
+current line, you can use the <kbd>f</kbd> or <kbd>F</kbd> commands. The lowercase
+<kbd>f</kbd> command moves forward, while the uppercase <kbd>F</kbd> command
+moves backwards.</p>
+
+<p>After you've pressed the <kbd>f</kbd> key, Vico waits for you to enter another
+character. This is the character to search for. For example, the command
+<kbd>f:</kbd> searches for the next occurrance of a colon on the current line.</p>
+
+<p>The <kbd>t</kbd> and <kbd>T</kbd> commands works similarly, but instead of
+moving exactly to the specified character, it stops just before.</p>
+
+<p>The last character searched for with those commands is remembered, and the
+search can be repeated with the <kbd>;</kbd> (semicolon) and <kbd>,</kbd>
+(comma) commands. They repeat the search in the same and opposite direction,
+respectively.</p>
+
+<ul>
+<li><a href="searching.shtml">Searching</a></li>
+</ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

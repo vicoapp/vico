@@ -1,0 +1,793 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>ViTextStorage Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.0.4 (build 703)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">Vico API </a></h1>
+				
+			</div>
+
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">ViTextStorage Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+
+	
+
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/columnAtLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- columnAtLocation:</option>
+	
+	<option value="//api/name/firstNonBlankForLineAtLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- firstNonBlankForLineAtLocation:</option>
+	
+	<option value="//api/name/isBlankLineAtLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- isBlankLineAtLocation:</option>
+	
+	<option value="//api/name/lineCount">&nbsp;&nbsp;&nbsp;&nbsp;- lineCount</option>
+	
+	<option value="//api/name/lineNumberAtLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- lineNumberAtLocation:</option>
+	
+	<option value="//api/name/locationForStartOfLine:">&nbsp;&nbsp;&nbsp;&nbsp;- locationForStartOfLine:</option>
+	
+	<option value="//api/name/rangeOfLeadingWhitespaceForLineAtLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- rangeOfLeadingWhitespaceForLineAtLocation:</option>
+	
+	<option value="//api/name/rangeOfLine:">&nbsp;&nbsp;&nbsp;&nbsp;- rangeOfLine:</option>
+	
+	<option value="//api/name/rangeOfLineAtLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- rangeOfLineAtLocation:</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+</ul></li>
+
+
+
+
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/columnAtLocation:">columnAtLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/firstNonBlankForLineAtLocation:">firstNonBlankForLineAtLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/isBlankLineAtLocation:">isBlankLineAtLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/lineCount">lineCount</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/lineNumberAtLocation:">lineNumberAtLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/locationForStartOfLine:">locationForStartOfLine:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/rangeOfLeadingWhitespaceForLineAtLocation:">rangeOfLeadingWhitespaceForLineAtLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/rangeOfLine:">rangeOfLine:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/rangeOfLineAtLocation:">rangeOfLineAtLocation:</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="ViTextStorage Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">ViTextStorage Class Reference</h1>
+					</div>
+				</div>
+				<div id="container">
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSTextStorage</td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">ViTextStorage.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>Text storage.</p>
+
+<p>Line numbers are 1-based. Columns are zero-based.</p>
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+
+						
+						
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/locationForStartOfLine:">&ndash;&nbsp;locationForStartOfLine:</a></code>
+		<span class="tooltip"><p>Find the start location of a line.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/rangeOfLine:">&ndash;&nbsp;rangeOfLine:</a></code>
+		<span class="tooltip"><p>Return the range of a line.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/rangeOfLineAtLocation:">&ndash;&nbsp;rangeOfLineAtLocation:</a></code>
+		<span class="tooltip"><p>Return the range of a line.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/lineNumberAtLocation:">&ndash;&nbsp;lineNumberAtLocation:</a></code>
+		<span class="tooltip"><p>Find the line number of a location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/lineCount">&ndash;&nbsp;lineCount</a></code>
+		<span class="tooltip"><p>Return the number of lines.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/columnAtLocation:">&ndash;&nbsp;columnAtLocation:</a></code>
+		<span class="tooltip"><p>Find the column of a location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/isBlankLineAtLocation:">&ndash;&nbsp;isBlankLineAtLocation:</a></code>
+		<span class="tooltip"><p>Determine if a line is blank.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/rangeOfLeadingWhitespaceForLineAtLocation:">&ndash;&nbsp;rangeOfLeadingWhitespaceForLineAtLocation:</a></code>
+		<span class="tooltip"><p>Find the range of leading whitespace on a line.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/firstNonBlankForLineAtLocation:">&ndash;&nbsp;firstNonBlankForLineAtLocation:</a></code>
+		<span class="tooltip"><p>Find the first non-blank character on a line.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+
+					
+					
+
+					
+
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/columnAtLocation:" title="columnAtLocation:"></a>
+	<h3 class="subsubtitle method-title">columnAtLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Find the column of a location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)columnAtLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location to check for column.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The logical column from the start of the line.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<div class="bug"><p>This method always uses the default tab size when determining the column.</p></div>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/firstNonBlankForLineAtLocation:" title="firstNonBlankForLineAtLocation:"></a>
+	<h3 class="subsubtitle method-title">firstNonBlankForLineAtLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Find the first non-blank character on a line.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)firstNonBlankForLineAtLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>A location on the line to check.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The location of the first non-blank character on the given line.
+If the line is blank (no non-blanks found), then the location of the end of the line is returned.
+Returns <code>NSNotFound</code> if <code>aLocation</code> is beyond the end of the document.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/isBlankLineAtLocation:" title="isBlankLineAtLocation:"></a>
+	<h3 class="subsubtitle method-title">isBlankLineAtLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Determine if a line is blank.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)isBlankLineAtLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>A location on the line to check.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the line at the given location is blank.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/lineCount" title="lineCount"></a>
+	<h3 class="subsubtitle method-title">lineCount</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Return the number of lines.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)lineCount</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The number of lines, or zero if the document is empty.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/lineNumberAtLocation:" title="lineNumberAtLocation:"></a>
+	<h3 class="subsubtitle method-title">lineNumberAtLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Find the line number of a location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)lineNumberAtLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location of the line number to return.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The line number at a given location. Returns 0 if the
+document is empty.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/locationForStartOfLine:" title="locationForStartOfLine:"></a>
+	<h3 class="subsubtitle method-title">locationForStartOfLine:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Find the start location of a line.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSInteger)locationForStartOfLine:(NSUInteger)<em>aLineNumber</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLineNumber</em></dt>
+			<dd><p>The line number to lookup.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The location for the start of the given line.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/rangeOfLeadingWhitespaceForLineAtLocation:" title="rangeOfLeadingWhitespaceForLineAtLocation:"></a>
+	<h3 class="subsubtitle method-title">rangeOfLeadingWhitespaceForLineAtLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Find the range of leading whitespace on a line.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSRange)rangeOfLeadingWhitespaceForLineAtLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>A location on the line to check.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>A range of leading whitespace for the given line.
+Returns (<code>NSNotFound</code>, <code>0</code>) if <code>aLocation</code> is beyond the end of the document.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/rangeOfLine:" title="rangeOfLine:"></a>
+	<h3 class="subsubtitle method-title">rangeOfLine:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Return the range of a line.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSRange)rangeOfLine:(NSUInteger)<em>lineNumber</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>lineNumber</em></dt>
+			<dd><p>The line number to return the range for.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The range of the line, or (<code>NSNotFound</code>, <code>0</code>) if the
+lineNumber is invalid.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/rangeOfLineAtLocation:" title="rangeOfLineAtLocation:"></a>
+	<h3 class="subsubtitle method-title">rangeOfLineAtLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Return the range of a line.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSRange)rangeOfLineAtLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location of a character on the line to return the range for.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The range of the line, or (<code>NSNotFound</code>, <code>0</code>) if the
+location is invalid.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextStorage.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2011 Martin Hedenfalk. All rights reserved. (Last updated: 2011-08-23)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.0.4 (build 703)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+
+					window.name = "";
+				}
+				return false;
+			}
+
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+
+				var tocList = document.getElementById('toc');
+
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+
+			window.onload = init;
+		</script>
+	</body>
+</html>

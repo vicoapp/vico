@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>The jumplist</title>
+  <script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-344189-7']);
+  _gaq.push(['_trackPageview']);
+ (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="../index.html"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="../index.html">home</a>
+        <a href="../download.html">download</a>
+        
+        <a href="index.html">help</a>
+        <a href="../api/index.html">api</a>
+      </p>
+    </header>
+    <div id="main">
+
+<h1>The jumplist</h1>
+
+<p>Vico maintains a list of locations while you move around in files. Some movement
+commands are considered "jumps", and those jumps are remembered in a list.</p>
+
+<p>Generally, movement commands that generate jumps are those that
+move more than a few lines. So the <a href="move_words.html">word</a>,
+<a href="move_chars.html">character</a> and <a href="line_search.html">line search</a>
+motion commands do not generate a jump, but the <a href="move_lines.html">line</a>
+and <a href="searching.html">search</a> motions do.</p>
+
+<p>You navigate the jumplist either by pressing the jumplist arrows in the toolbar,
+or pressing <kbd>ctrl-o</kbd> to go back and <kbd>ctrl-i</kbd>
+(or <kbd>tab</kbd>) to go forward. </p>
+
+<p>Only the last 100 jumps are remembered, and duplicates are removed.</p>
+
+    </div>
+  </div>
+  <footer>
+  </footer>
+</body>
+</html>

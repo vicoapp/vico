@@ -1,0 +1,62 @@
+<!--#set var="title" value="Creating a key for SFTP" -->
+<!--#include virtual="/inc/head.shtml" -->
+<h1>Creating a key for SFTP</h1>
+
+<p>To create a public/private key for SFTP (or ssh in general), you need to open
+Terminal.app and run the <kbd>ssh-keygen</kbd> command:</p>
+
+<pre><code>ssh-keygen -t rsa
+</code></pre>
+
+<p>It should look something like this;</p>
+
+<pre><code>martinh@macbookpro:~$ ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/Users/martinh/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /Users/martinh/.ssh/id_rsa.
+Your public key has been saved in /Users/martinh/.ssh/id_rsa.pub.
+The key fingerprint is:
+77:15:d9:55:4f:b9:01:90:2c:48:ae:3b:39:22:52:fa martinh@macbookpro.local
+The key's randomart image is:
++--[ RSA 2048]----+
+|      ... ..o.ooB|
+|      .. . o  .=o|
+|       .  .   . +|
+|      .      . . |
+|  .  .  S . .    |
+| o    o  . .     |
+|o. . =           |
+|... . o          |
+|  E              |
++-----------------+
+martinh@macbookpro:~$
+</code></pre>
+
+<p>Make sure you use a good passphrase. If you leave the passphrase empty, anyone
+with access to your key file have access to any remote server you authorize with
+that key.</p>
+
+<p>To authorize a remote server to log you in with this key, you copy the
+<em>public key</em> to the <kbd>~/.ssh/authorized_keys</kbd> file on the remote server:</p>
+
+<pre><code>cat ~/.ssh/id_rsa.pub | ssh hostname 'mkdir -m700 -p .ssh &amp;&amp; cat &gt;&gt; .ssh/authorized_keys'
+</code></pre>
+
+<p>The above command makes sure the remote <kbd>.ssh</kbd> directory exists and has
+the correct permissions, and appends your new public key to any existing
+authorized keys.</p>
+
+<p>If you have multiple keys, or use non-standard filenames, you may have to tell
+ssh what key to use. You can do this by adding a host directive in the ssh
+configuration file, <kbd>~/.ssh/config</kbd>:</p>
+
+<pre><code>Host www.example.com
+    IdentityFile ~/.ssh/id_rsa.example.com
+</code></pre>
+
+<ul>
+<li><a href="http://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man5/ssh_config.5.html">ssh_config(5) manual page</a></li>
+</ul>
+<!--#include virtual="/inc/tail.shtml" -->

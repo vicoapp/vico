@@ -1,0 +1,731 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>ViWindowController Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.0.4 (build 703)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">Vico API </a></h1>
+				
+			</div>
+
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">ViWindowController Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+
+	
+	<option value="class_methods">Class Methods</option>
+	
+	<option value="//api/name/currentWindowController">&nbsp;&nbsp;&nbsp;&nbsp;+ currentWindowController</option>
+	
+	
+
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/closeDocument:andWindow:">&nbsp;&nbsp;&nbsp;&nbsp;- closeDocument:andWindow:</option>
+	
+	<option value="//api/name/currentDocument">&nbsp;&nbsp;&nbsp;&nbsp;- currentDocument</option>
+	
+	<option value="//api/name/currentView">&nbsp;&nbsp;&nbsp;&nbsp;- currentView</option>
+	
+	<option value="//api/name/documents">&nbsp;&nbsp;&nbsp;&nbsp;- documents</option>
+	
+	<option value="//api/name/gotoURL:">&nbsp;&nbsp;&nbsp;&nbsp;- gotoURL:</option>
+	
+	<option value="//api/name/gotoURL:line:column:">&nbsp;&nbsp;&nbsp;&nbsp;- gotoURL:line:column:</option>
+	
+	<option value="//api/name/splitVertically:andOpen:orSwitchToDocument:allowReusedView:">&nbsp;&nbsp;&nbsp;&nbsp;- splitVertically:andOpen:orSwitchToDocument:allowReusedView:</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+</ul></li>
+
+
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#class_methods">Class Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/currentWindowController">currentWindowController</a></span></li>
+	
+</ul></li>
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/closeDocument:andWindow:">closeDocument:andWindow:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/currentDocument">currentDocument</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/currentView">currentView</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/documents">documents</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/gotoURL:">gotoURL:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/gotoURL:line:column:">gotoURL:line:column:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/splitVertically:andOpen:orSwitchToDocument:allowReusedView:">splitVertically:andOpen:orSwitchToDocument:allowReusedView:</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="ViWindowController Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">ViWindowController Class Reference</h1>
+					</div>
+				</div>
+				<div id="container">
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSWindowController</td>
+</tr><tr>
+	<td class="specification-title">Conforms to</td>
+	<td class="specification-value">NSTextFieldDelegate<br />NSToolbarDelegate<br />NSWindowDelegate<br />ViDeferredDelegate<br />ViJumpListDelegate</td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">ViWindowController.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>A <a href="ViWindowController.html">ViWindowController</a> object manages a document window.</p>
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+
+						
+						
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/currentWindowController">+&nbsp;currentWindowController</a></code>
+		<span class="tooltip"><p>The currently active window controller.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/documents">&ndash;&nbsp;documents</a></code>
+		<span class="tooltip"><p>The documents open in the window.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/closeDocument:andWindow:">&ndash;&nbsp;closeDocument:andWindow:</a></code>
+		<span class="tooltip"><p>Close a document, and optionally the window.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/currentView">&ndash;&nbsp;currentView</a></code>
+		<span class="tooltip"><p>The currently focused view.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/currentDocument">&ndash;&nbsp;currentDocument</a></code>
+		<span class="tooltip"><p>The currently focused document, or <code>nil</code> if no document is focused.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/gotoURL:line:column:">&ndash;&nbsp;gotoURL:line:column:</a></code>
+		<span class="tooltip"><p>Open a document and go to a specific point in the file.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/gotoURL:">&ndash;&nbsp;gotoURL:</a></code>
+		<span class="tooltip"><p>Open a document.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/splitVertically:andOpen:orSwitchToDocument:allowReusedView:">&ndash;&nbsp;splitVertically:andOpen:orSwitchToDocument:allowReusedView:</a></code>
+		<span class="tooltip"><p>Split the current view and display another document.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+
+					
+					
+
+					
+					<div class="section section-methods">
+						<a title="Class Methods" name="class_methods"></a>
+						<h2 class="subtitle subtitle-methods">Class Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/currentWindowController" title="currentWindowController"></a>
+	<h3 class="subsubtitle method-title">currentWindowController</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The currently active window controller.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViWindowController *)currentWindowController</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The currently active window controller.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViWindowController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/closeDocument:andWindow:" title="closeDocument:andWindow:"></a>
+	<h3 class="subsubtitle method-title">closeDocument:andWindow:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Close a document, and optionally the window.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)closeDocument:(ViDocument *)<em>document</em> andWindow:(BOOL)<em>canCloseWindow</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>document</em></dt>
+			<dd><p>The document to close.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>canCloseWindow</em></dt>
+			<dd><p>YES if the window should be closed if there are no more documents in the window.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViWindowController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/currentDocument" title="currentDocument"></a>
+	<h3 class="subsubtitle method-title">currentDocument</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The currently focused document, or <code>nil</code> if no document is focused.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViDocument *)currentDocument</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The currently focused document, or <code>nil</code> if no document is focused.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViWindowController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/currentView" title="currentView"></a>
+	<h3 class="subsubtitle method-title">currentView</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The currently focused view.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (id&lt;ViViewController&gt;)currentView</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The currently focused view.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViWindowController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/documents" title="documents"></a>
+	<h3 class="subsubtitle method-title">documents</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The documents open in the window.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSArray *)documents</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The documents open in the window.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViWindowController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/gotoURL:" title="gotoURL:"></a>
+	<h3 class="subsubtitle method-title">gotoURL:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Open a document.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)gotoURL:(NSURL *)<em>url</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>url</em></dt>
+			<dd><p>The URL of the document to open. The document may already be opened.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the document could be opened.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViWindowController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/gotoURL:line:column:" title="gotoURL:line:column:"></a>
+	<h3 class="subsubtitle method-title">gotoURL:line:column:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Open a document and go to a specific point in the file.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)gotoURL:(NSURL *)<em>url</em> line:(NSUInteger)<em>line</em> column:(NSUInteger)<em>column</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>url</em></dt>
+			<dd><p>The URL of the document to open. The document may already be opened.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>line</em></dt>
+			<dd><p>The line number to jump to, or <code>0</code> to not jump to any line.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>column</em></dt>
+			<dd><p>The column to jump to.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the document could be opened.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViWindowController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/splitVertically:andOpen:orSwitchToDocument:allowReusedView:" title="splitVertically:andOpen:orSwitchToDocument:allowReusedView:"></a>
+	<h3 class="subsubtitle method-title">splitVertically:andOpen:orSwitchToDocument:allowReusedView:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Split the current view and display another document.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (id&lt;ViViewController&gt;)splitVertically:(BOOL)<em>isVertical</em> andOpen:(id)<em>filenameOrURL</em> orSwitchToDocument:(ViDocument *)<em>doc</em> allowReusedView:(BOOL)<em>allowReusedView</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>isVertical</em></dt>
+			<dd><p>YES to split vertically, NO for a horizontal split.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>filenameOrURL</em></dt>
+			<dd><p>A path (as an NSString) or a URL pointing to a document to open. The document may already be open.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>doc</em></dt>
+			<dd><p>An already open document that should be displayed in the split view.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>allowReusedView</em></dt>
+			<dd><p>YES to focus an already visible view for the given document. NO to always create a new split view.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The new split view.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViWindowController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2011 Martin Hedenfalk. All rights reserved. (Last updated: 2011-08-23)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.0.4 (build 703)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+
+					window.name = "";
+				}
+				return false;
+			}
+
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+
+				var tocList = document.getElementById('toc');
+
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+
+			window.onload = init;
+		</script>
+	</body>
+</html>

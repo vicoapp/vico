@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="css/blog.css" />
+  <title>About Vico</title>
+  <script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', '[% google_analytics_id %]']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+  <script src="fancybox/jquery.easing-1.3.pack.js"></script>
+  <script src="fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+  <link rel="stylesheet" type="text/css" href="fancybox/jquery.fancybox-1.3.4.css" media="screen" />
+  <script>
+  $(document).ready(function() { 
+    $("a[rel=screenshots]").fancybox({
+      'transitionIn'	: 'elastic',
+      'transitionOut'	: 'elastic',
+      'easingIn'	: 'easeInBack',
+      'easingOut'	: 'easeInBack',
+      'titlePosition' : 'over'
+    });
+  });
+  </script>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="index.html"><img src="img/logo_vico_96.png" alt="Vico" /></a>
+      	<a href="about.html">about</a>
+      	<a href="download.html">download</a>
+      	<a href="help/index.html">help</a>
+      </p>
+    </header>
+    <div id="main">
+      <p>Vico is a programmers text editor for Mac OS X.</p>
+      <p>Some of the features are:</p>
+      <ul>
+        <li>strong focus on keyboard control (vi key bindings)</li>
+        <li>integrated SFTP</li>
+        <li>compatible with textmate bundles</li>
+        <li>split views</li>
+        <li>scriptable in <a href="http://programming.nu/">nu</a></li>
+      </ul>
+      <p>
+        <a rel="screenshots" href="img/split.png" title="Split screens"><img alt="" src="img/split_small.jpg" /></a>
+        <a rel="screenshots" href="img/sidebar.png" title="Sidebar with file explorer and context menu with bundle commands"><img alt="" src="img/sidebar_small.jpg" /></a>
+        <a rel="screenshots" href="img/symlist.png" title="Symbol list"><img alt="" src="img/symlist_small.jpg" /></a>
+      </p>
+      <p class="caption">
+        Click images to see a larger version.
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+      </a>
+      Follow Vico on Twitter
+    </p>
+    <p>
+      <a href="mailto:martin@vicoapp.com">martin@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

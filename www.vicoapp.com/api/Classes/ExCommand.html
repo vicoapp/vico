@@ -1,0 +1,1233 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>ExCommand Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.0.4 (build 703)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">Vico API </a></h1>
+				
+			</div>
+
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">ExCommand Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+	<option value="properties">Properties</option>
+	
+	<option value="//api/name/addr1">&nbsp;&nbsp;&nbsp;&nbsp;addr1</option>
+	
+	<option value="//api/name/addr2">&nbsp;&nbsp;&nbsp;&nbsp;addr2</option>
+	
+	<option value="//api/name/append">&nbsp;&nbsp;&nbsp;&nbsp;append</option>
+	
+	<option value="//api/name/arg">&nbsp;&nbsp;&nbsp;&nbsp;arg</option>
+	
+	<option value="//api/name/caret">&nbsp;&nbsp;&nbsp;&nbsp;caret</option>
+	
+	<option value="//api/name/count">&nbsp;&nbsp;&nbsp;&nbsp;count</option>
+	
+	<option value="//api/name/filter">&nbsp;&nbsp;&nbsp;&nbsp;filter</option>
+	
+	<option value="//api/name/force">&nbsp;&nbsp;&nbsp;&nbsp;force</option>
+	
+	<option value="//api/name/line">&nbsp;&nbsp;&nbsp;&nbsp;line</option>
+	
+	<option value="//api/name/lineAddress">&nbsp;&nbsp;&nbsp;&nbsp;lineAddress</option>
+	
+	<option value="//api/name/lineRange">&nbsp;&nbsp;&nbsp;&nbsp;lineRange</option>
+	
+	<option value="//api/name/mapping">&nbsp;&nbsp;&nbsp;&nbsp;mapping</option>
+	
+	<option value="//api/name/naddr">&nbsp;&nbsp;&nbsp;&nbsp;naddr</option>
+	
+	<option value="//api/name/nextCommand">&nbsp;&nbsp;&nbsp;&nbsp;nextCommand</option>
+	
+	<option value="//api/name/options">&nbsp;&nbsp;&nbsp;&nbsp;options</option>
+	
+	<option value="//api/name/pattern">&nbsp;&nbsp;&nbsp;&nbsp;pattern</option>
+	
+	<option value="//api/name/plus_command">&nbsp;&nbsp;&nbsp;&nbsp;plus_command</option>
+	
+	<option value="//api/name/range">&nbsp;&nbsp;&nbsp;&nbsp;range</option>
+	
+	<option value="//api/name/reg">&nbsp;&nbsp;&nbsp;&nbsp;reg</option>
+	
+	<option value="//api/name/replacement">&nbsp;&nbsp;&nbsp;&nbsp;replacement</option>
+	
+	
+
+	
+
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/message:">&nbsp;&nbsp;&nbsp;&nbsp;- message:</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#properties">Properties</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/addr1">addr1</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/addr2">addr2</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/append">append</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/arg">arg</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/caret">caret</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/count">count</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/filter">filter</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/force">force</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/line">line</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/lineAddress">lineAddress</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/lineRange">lineRange</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/mapping">mapping</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/naddr">naddr</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/nextCommand">nextCommand</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/options">options</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/pattern">pattern</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/plus_command">plus_command</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/range">range</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/reg">reg</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/replacement">replacement</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/message:">message:</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="ExCommand Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">ExCommand Class Reference</h1>
+					</div>
+				</div>
+				<div id="container">
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSObject</td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">ExCommand.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>A generated ex command.</p>
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+
+						
+						
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/mapping">&nbsp;&nbsp;mapping</a></code>
+		<span class="tooltip"><p>The <a href="#//api/name/mapping">mapping</a> that describes the action.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/naddr">&nbsp;&nbsp;naddr</a></code>
+		<span class="tooltip"><p>Number of addresses given in the <a href="#//api/name/range">range</a>.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/addr1">&nbsp;&nbsp;addr1</a></code>
+		<span class="tooltip"><p>First <a href="#//api/name/range">range</a> address.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/addr2">&nbsp;&nbsp;addr2</a></code>
+		<span class="tooltip"><p>Second <a href="#//api/name/range">range</a> address.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/lineAddress">&nbsp;&nbsp;lineAddress</a></code>
+		<span class="tooltip"><p>Target <a href="#//api/name/line">line</a> address.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/range">&nbsp;&nbsp;range</a></code>
+		<span class="tooltip"><p>Resolved character <a href="#//api/name/range">range</a> of affected text.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/lineRange">&nbsp;&nbsp;lineRange</a></code>
+		<span class="tooltip"><p>Resolved <a href="#//api/name/line">line</a> <a href="#//api/name/range">range</a> of affected text.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/line">&nbsp;&nbsp;line</a></code>
+		<span class="tooltip"><p>Resolved target <a href="#//api/name/line">line</a> number.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/count">&nbsp;&nbsp;count</a></code>
+		<span class="tooltip"><p>Count argument.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/force">&nbsp;&nbsp;force</a></code>
+		<span class="tooltip"><p>YES if <code>!</code> flag specified.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/append">&nbsp;&nbsp;append</a></code>
+		<span class="tooltip"><p>YES if <code>&gt;&gt;</code> flag specified.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/filter">&nbsp;&nbsp;filter</a></code>
+		<span class="tooltip"><p>YES if filtering (as in <code>:read !ls</code> or <code>:write !wc</code>).</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/nextCommand">&nbsp;&nbsp;nextCommand</a></code>
+		<span class="tooltip"><p>Next ex command separated with a bar (<code>|</code>).</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/arg">&nbsp;&nbsp;arg</a></code>
+		<span class="tooltip"><p>Extra argument string.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/plus_command">&nbsp;&nbsp;plus_command</a></code>
+		<span class="tooltip"><p>Ex command string for the <code>+</code> argument (as in <code>:edit +cmd file</code>).</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/pattern">&nbsp;&nbsp;pattern</a></code>
+		<span class="tooltip"><p>Regular expression <a href="#//api/name/pattern">pattern</a>.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/replacement">&nbsp;&nbsp;replacement</a></code>
+		<span class="tooltip"><p>Replacement template string for <code>:s</code> command.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/options">&nbsp;&nbsp;options</a></code>
+		<span class="tooltip"><p>Regular expression option string for <code>:s</code> command.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/reg">&nbsp;&nbsp;reg</a></code>
+		<span class="tooltip"><p>Destination register, or 0 if none specified.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/caret">&nbsp;&nbsp;caret</a></code>
+		<span class="tooltip"><p>If set, specifies final location of <a href="#//api/name/caret">caret</a> after command returns.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/message:">&ndash;&nbsp;message:</a></code>
+		<span class="tooltip"><p>Return a message to caller.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-methods">
+						<a title="Properties" name="properties"></a>
+						<h2 class="subtitle subtitle-methods">Properties</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/addr1" title="addr1"></a>
+	<h3 class="subsubtitle method-title">addr1</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>First <a href="#//api/name/range">range</a> address.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) ExAddress *addr1</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/addr2" title="addr2"></a>
+	<h3 class="subsubtitle method-title">addr2</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Second <a href="#//api/name/range">range</a> address.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) ExAddress *addr2</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/append" title="append"></a>
+	<h3 class="subsubtitle method-title">append</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if <code>&gt;&gt;</code> flag specified.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) BOOL append</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/arg" title="arg"></a>
+	<h3 class="subsubtitle method-title">arg</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Extra argument string.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) NSString *arg</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/caret" title="caret"></a>
+	<h3 class="subsubtitle method-title">caret</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>If set, specifies final location of <a href="#//api/name/caret">caret</a> after command returns.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) NSInteger caret</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/count" title="count"></a>
+	<h3 class="subsubtitle method-title">count</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Count argument.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) NSInteger count</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/filter" title="filter"></a>
+	<h3 class="subsubtitle method-title">filter</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if filtering (as in <code>:read !ls</code> or <code>:write !wc</code>).</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) BOOL filter</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/force" title="force"></a>
+	<h3 class="subsubtitle method-title">force</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if <code>!</code> flag specified.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) BOOL force</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/line" title="line"></a>
+	<h3 class="subsubtitle method-title">line</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Resolved target <a href="#//api/name/line">line</a> number.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) NSUInteger line</code></div>
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>This is an absolute <a href="#//api/name/line">line</a> number.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/lineAddress" title="lineAddress"></a>
+	<h3 class="subsubtitle method-title">lineAddress</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Target <a href="#//api/name/line">line</a> address.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) ExAddress *lineAddress</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/lineRange" title="lineRange"></a>
+	<h3 class="subsubtitle method-title">lineRange</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Resolved <a href="#//api/name/line">line</a> <a href="#//api/name/range">range</a> of affected text.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) NSRange lineRange</code></div>
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p><code></code>lineRange<code>.location</code> specifies a <a href="#//api/name/line">line</a> number, and <code></code>lineRange<code>.lenght</code> number of affected lines.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/mapping" title="mapping"></a>
+	<h3 class="subsubtitle method-title">mapping</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The <a href="#//api/name/mapping">mapping</a> that describes the action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) ExMapping *mapping</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/naddr" title="naddr"></a>
+	<h3 class="subsubtitle method-title">naddr</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Number of addresses given in the <a href="#//api/name/range">range</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) NSUInteger naddr</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/nextCommand" title="nextCommand"></a>
+	<h3 class="subsubtitle method-title">nextCommand</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Next ex command separated with a bar (<code>|</code>).</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) ExCommand *nextCommand</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/options" title="options"></a>
+	<h3 class="subsubtitle method-title">options</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Regular expression option string for <code>:s</code> command.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) NSString *options</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/pattern" title="pattern"></a>
+	<h3 class="subsubtitle method-title">pattern</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Regular expression <a href="#//api/name/pattern">pattern</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) NSString *pattern</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/plus_command" title="plus_command"></a>
+	<h3 class="subsubtitle method-title">plus_command</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Ex command string for the <code>+</code> argument (as in <code>:edit +cmd file</code>).</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) NSString *plus_command</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/range" title="range"></a>
+	<h3 class="subsubtitle method-title">range</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Resolved character <a href="#//api/name/range">range</a> of affected text.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) NSRange range</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/reg" title="reg"></a>
+	<h3 class="subsubtitle method-title">reg</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Destination register, or 0 if none specified.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) unichar reg</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/replacement" title="replacement"></a>
+	<h3 class="subsubtitle method-title">replacement</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Replacement template string for <code>:s</code> command.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, assign, readwrite) NSString *replacement</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+
+					
+
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/message:" title="message:"></a>
+	<h3 class="subsubtitle method-title">message:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Return a message to caller.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)message:(NSString *)<em>message</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>message</em></dt>
+			<dd><p>The message to display.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>The last message will be shown in the ex command <a href="#//api/name/line">line</a> after command returns.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ExCommand.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2011 Martin Hedenfalk. All rights reserved. (Last updated: 2011-08-23)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.0.4 (build 703)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+
+					window.name = "";
+				}
+				return false;
+			}
+
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+
+				var tocList = document.getElementById('toc');
+
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+
+			window.onload = init;
+		</script>
+	</body>
+</html>

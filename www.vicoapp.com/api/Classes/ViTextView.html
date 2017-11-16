@@ -1,0 +1,2312 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>ViTextView Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.0.4 (build 703)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">Vico API </a></h1>
+				
+			</div>
+
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">ViTextView Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+	<option value="properties">Properties</option>
+	
+	<option value="//api/name/document">&nbsp;&nbsp;&nbsp;&nbsp;document</option>
+	
+	<option value="//api/name/keyManager">&nbsp;&nbsp;&nbsp;&nbsp;keyManager</option>
+	
+	<option value="//api/name/mode">&nbsp;&nbsp;&nbsp;&nbsp;mode</option>
+	
+	<option value="//api/name/visual_line_mode">&nbsp;&nbsp;&nbsp;&nbsp;visual_line_mode</option>
+	
+	
+
+	
+
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/caret">&nbsp;&nbsp;&nbsp;&nbsp;- caret</option>
+	
+	<option value="//api/name/characterAtIndex:">&nbsp;&nbsp;&nbsp;&nbsp;- characterAtIndex:</option>
+	
+	<option value="//api/name/currentCharacter">&nbsp;&nbsp;&nbsp;&nbsp;- currentCharacter</option>
+	
+	<option value="//api/name/currentColumn">&nbsp;&nbsp;&nbsp;&nbsp;- currentColumn</option>
+	
+	<option value="//api/name/currentLine">&nbsp;&nbsp;&nbsp;&nbsp;- currentLine</option>
+	
+	<option value="//api/name/currentScreenColumn">&nbsp;&nbsp;&nbsp;&nbsp;- currentScreenColumn</option>
+	
+	<option value="//api/name/cutToRegister:range:">&nbsp;&nbsp;&nbsp;&nbsp;- cutToRegister:range:</option>
+	
+	<option value="//api/name/deleteRange:">&nbsp;&nbsp;&nbsp;&nbsp;- deleteRange:</option>
+	
+	<option value="//api/name/environment">&nbsp;&nbsp;&nbsp;&nbsp;- environment</option>
+	
+	<option value="//api/name/gotoColumn:fromLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- gotoColumn:fromLocation:</option>
+	
+	<option value="//api/name/gotoLine:column:">&nbsp;&nbsp;&nbsp;&nbsp;- gotoLine:column:</option>
+	
+	<option value="//api/name/input:">&nbsp;&nbsp;&nbsp;&nbsp;- input:</option>
+	
+	<option value="//api/name/insertNewlineAtLocation:indentForward:">&nbsp;&nbsp;&nbsp;&nbsp;- insertNewlineAtLocation:indentForward:</option>
+	
+	<option value="//api/name/insertSnippet:">&nbsp;&nbsp;&nbsp;&nbsp;- insertSnippet:</option>
+	
+	<option value="//api/name/insertSnippet:atLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- insertSnippet:atLocation:</option>
+	
+	<option value="//api/name/insertSnippet:inRange:">&nbsp;&nbsp;&nbsp;&nbsp;- insertSnippet:inRange:</option>
+	
+	<option value="//api/name/insertString:">&nbsp;&nbsp;&nbsp;&nbsp;- insertString:</option>
+	
+	<option value="//api/name/insertString:atLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- insertString:atLocation:</option>
+	
+	<option value="//api/name/line">&nbsp;&nbsp;&nbsp;&nbsp;- line</option>
+	
+	<option value="//api/name/markNamed:">&nbsp;&nbsp;&nbsp;&nbsp;- markNamed:</option>
+	
+	<option value="//api/name/popUpContextMenu:">&nbsp;&nbsp;&nbsp;&nbsp;- popUpContextMenu:</option>
+	
+	<option value="//api/name/preference:">&nbsp;&nbsp;&nbsp;&nbsp;- preference:</option>
+	
+	<option value="//api/name/preference:atLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- preference:atLocation:</option>
+	
+	<option value="//api/name/replaceRange:withString:">&nbsp;&nbsp;&nbsp;&nbsp;- replaceRange:withString:</option>
+	
+	<option value="//api/name/scrollToCaret">&nbsp;&nbsp;&nbsp;&nbsp;- scrollToCaret</option>
+	
+	<option value="//api/name/setCaret:">&nbsp;&nbsp;&nbsp;&nbsp;- setCaret:</option>
+	
+	<option value="//api/name/setInsertMode">&nbsp;&nbsp;&nbsp;&nbsp;- setInsertMode</option>
+	
+	<option value="//api/name/setMark:atLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- setMark:atLocation:</option>
+	
+	<option value="//api/name/setNormalMode">&nbsp;&nbsp;&nbsp;&nbsp;- setNormalMode</option>
+	
+	<option value="//api/name/setVisualMode">&nbsp;&nbsp;&nbsp;&nbsp;- setVisualMode</option>
+	
+	<option value="//api/name/textStorage">&nbsp;&nbsp;&nbsp;&nbsp;- textStorage</option>
+	
+	<option value="//api/name/yankToRegister:range:">&nbsp;&nbsp;&nbsp;&nbsp;- yankToRegister:range:</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Caret handling">Caret handling</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Setting marks">Setting marks</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Manipulating text">Manipulating text</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Working with registers">Working with registers</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Popup menus">Popup menus</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Working with TextMate Bundles">Working with TextMate Bundles</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_snippets Methods">snippets Methods</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#properties">Properties</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/document">document</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/keyManager">keyManager</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/mode">mode</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/visual_line_mode">visual_line_mode</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/caret">caret</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/characterAtIndex:">characterAtIndex:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/currentCharacter">currentCharacter</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/currentColumn">currentColumn</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/currentLine">currentLine</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/currentScreenColumn">currentScreenColumn</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/cutToRegister:range:">cutToRegister:range:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/deleteRange:">deleteRange:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/environment">environment</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/gotoColumn:fromLocation:">gotoColumn:fromLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/gotoLine:column:">gotoLine:column:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/input:">input:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/insertNewlineAtLocation:indentForward:">insertNewlineAtLocation:indentForward:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/insertSnippet:">insertSnippet:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/insertSnippet:atLocation:">insertSnippet:atLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/insertSnippet:inRange:">insertSnippet:inRange:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/insertString:">insertString:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/insertString:atLocation:">insertString:atLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/line">line</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/markNamed:">markNamed:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/popUpContextMenu:">popUpContextMenu:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/preference:">preference:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/preference:atLocation:">preference:atLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/replaceRange:withString:">replaceRange:withString:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/scrollToCaret">scrollToCaret</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setCaret:">setCaret:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setInsertMode">setInsertMode</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setMark:atLocation:">setMark:atLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setNormalMode">setNormalMode</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setVisualMode">setVisualMode</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/textStorage">textStorage</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/yankToRegister:range:">yankToRegister:range:</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="ViTextView Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">ViTextView Class Reference</h1>
+					</div>
+				</div>
+				<div id="container">
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSTextView</td>
+</tr><tr>
+	<td class="specification-title">Conforms to</td>
+	<td class="specification-value">ViCompletionDelegate<br /><a href="../Protocols/ViKeyManagerTarget.html">ViKeyManagerTarget</a><br />ViSnippetDelegate</td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">ViTextView.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>A text edit view.</p>
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+
+						
+						<h3 class="subsubtitle task-title">Other Methods</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/keyManager">&nbsp;&nbsp;keyManager</a></code>
+		<span class="tooltip"><p>Associated key manager.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/document">&nbsp;&nbsp;document</a></code>
+		<span class="tooltip"><p>Associated <a href="#//api/name/document">document</a>.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/mode">&nbsp;&nbsp;mode</a></code>
+		<span class="tooltip"><p>Vi <a href="#//api/name/mode">mode</a> (insert, normal or visual).</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/visual_line_mode">&nbsp;&nbsp;visual_line_mode</a></code>
+		<span class="tooltip"><p>YES if in visual <a href="#//api/name/line">line</a> <a href="#//api/name/mode">mode</a>.
+Only valid if in visual <a href="#//api/name/mode">mode</a>.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/textStorage">&ndash;&nbsp;textStorage</a></code>
+		<span class="tooltip"><p>The associated <a href="../Classes/ViTextStorage.html">ViTextStorage</a> object.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setNormalMode">&ndash;&nbsp;setNormalMode</a></code>
+		<span class="tooltip"><p>Set normal <a href="#//api/name/mode">mode</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setVisualMode">&ndash;&nbsp;setVisualMode</a></code>
+		<span class="tooltip"><p>Set visual <a href="#//api/name/mode">mode</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setInsertMode">&ndash;&nbsp;setInsertMode</a></code>
+		<span class="tooltip"><p>Set insert <a href="#//api/name/mode">mode</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/input:">&ndash;&nbsp;input:</a></code>
+		<span class="tooltip"><p>Input a string of keys as a macro.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Caret handling" name="task_Caret handling"></a>
+						<h3 class="subsubtitle task-title">Caret handling</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setCaret:">&ndash;&nbsp;setCaret:</a></code>
+		<span class="tooltip"><p>Set the location of the <a href="#//api/name/caret">caret</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/scrollToCaret">&ndash;&nbsp;scrollToCaret</a></code>
+		<span class="tooltip"><p>Scroll the view to the <a href="#//api/name/caret">caret</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/caret">&ndash;&nbsp;caret</a></code>
+		<span class="tooltip"><p>The location of the <a href="#//api/name/caret">caret</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/currentLine">&ndash;&nbsp;currentLine</a></code>
+		<span class="tooltip"><p>The current <a href="#//api/name/line">line</a> number.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/currentColumn">&ndash;&nbsp;currentColumn</a></code>
+		<span class="tooltip"><p>The current column.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/currentScreenColumn">&ndash;&nbsp;currentScreenColumn</a></code>
+		<span class="tooltip"><p>The current screen column. This may be different from <a href="#//api/name/currentColumn">currentColumn</a> if <a href="#//api/name/line">line</a> wrapping is in effect.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/gotoColumn:fromLocation:">&ndash;&nbsp;gotoColumn:fromLocation:</a></code>
+		<span class="tooltip"><p>Go to a specific column.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/gotoLine:column:">&ndash;&nbsp;gotoLine:column:</a></code>
+		<span class="tooltip"><p>Go to a specific <a href="#//api/name/line">line</a> and column.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/characterAtIndex:">&ndash;&nbsp;characterAtIndex:</a></code>
+		<span class="tooltip"><p>Get the character at a location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/currentCharacter">&ndash;&nbsp;currentCharacter</a></code>
+		<span class="tooltip"><p>The character under the <a href="#//api/name/caret">caret</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/line">&ndash;&nbsp;line</a></code>
+		<span class="tooltip"><p>The content of the current <a href="#//api/name/line">line</a>.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Setting marks" name="task_Setting marks"></a>
+						<h3 class="subsubtitle task-title">Setting marks</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/markNamed:">&ndash;&nbsp;markNamed:</a></code>
+		<span class="tooltip"><p>Lookup a marked location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setMark:atLocation:">&ndash;&nbsp;setMark:atLocation:</a></code>
+		<span class="tooltip"><p>Set a mark.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Manipulating text" name="task_Manipulating text"></a>
+						<h3 class="subsubtitle task-title">Manipulating text</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/insertString:atLocation:">&ndash;&nbsp;insertString:atLocation:</a></code>
+		<span class="tooltip"><p>Insert a string at a location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/insertString:">&ndash;&nbsp;insertString:</a></code>
+		<span class="tooltip"><p>Insert a string at the current location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/deleteRange:">&ndash;&nbsp;deleteRange:</a></code>
+		<span class="tooltip"><p>Delete a range of text.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/replaceRange:withString:">&ndash;&nbsp;replaceRange:withString:</a></code>
+		<span class="tooltip"><p>Replace a range of text with a string.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/insertNewlineAtLocation:indentForward:">&ndash;&nbsp;insertNewlineAtLocation:indentForward:</a></code>
+		<span class="tooltip"><p>Insert new<a href="#//api/name/line">line</a> and indent.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Working with registers" name="task_Working with registers"></a>
+						<h3 class="subsubtitle task-title">Working with registers</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/yankToRegister:range:">&ndash;&nbsp;yankToRegister:range:</a></code>
+		<span class="tooltip"><p>Copying text to a register.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/cutToRegister:range:">&ndash;&nbsp;cutToRegister:range:</a></code>
+		<span class="tooltip"><p>Cut text to a register.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Popup menus" name="task_Popup menus"></a>
+						<h3 class="subsubtitle task-title">Popup menus</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/popUpContextMenu:">&ndash;&nbsp;popUpContextMenu:</a></code>
+		<span class="tooltip"><p>Show a popup menu at the carets location.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Working with TextMate Bundles" name="task_Working with TextMate Bundles"></a>
+						<h3 class="subsubtitle task-title">Working with TextMate Bundles</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/environment">&ndash;&nbsp;environment</a></code>
+		<span class="tooltip"><p>Bundle <a href="#//api/name/environment">environment</a> variables.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/preference:atLocation:">&ndash;&nbsp;preference:atLocation:</a></code>
+		<span class="tooltip"><p>A bundle preference at a given location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/preference:">&ndash;&nbsp;preference:</a></code>
+		<span class="tooltip"><p>A bundle preference at the current location.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="snippets Methods" name="task_snippets Methods"></a>
+						<h3 class="subsubtitle task-title">snippets Methods</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/insertSnippet:inRange:">&ndash;&nbsp;insertSnippet:inRange:</a></code>
+		<span class="tooltip"><p>Insert a snippet, replacing the trigger word.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/insertSnippet:atLocation:">&ndash;&nbsp;insertSnippet:atLocation:</a></code>
+		<span class="tooltip"><p>Insert a snippet at a given location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/insertSnippet:">&ndash;&nbsp;insertSnippet:</a></code>
+		<span class="tooltip"><p>Insert a snippet at the current location.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-methods">
+						<a title="Properties" name="properties"></a>
+						<h2 class="subtitle subtitle-methods">Properties</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/document" title="document"></a>
+	<h3 class="subsubtitle method-title">document</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Associated <a href="#//api/name/document">document</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) ViDocument *document</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/keyManager" title="keyManager"></a>
+	<h3 class="subsubtitle method-title">keyManager</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Associated key manager.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite, assign) ViKeyManager *keyManager</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/mode" title="mode"></a>
+	<h3 class="subsubtitle method-title">mode</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Vi <a href="#//api/name/mode">mode</a> (insert, normal or visual).</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) ViMode mode</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/visual_line_mode" title="visual_line_mode"></a>
+	<h3 class="subsubtitle method-title">visual_line_mode</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if in visual <a href="#//api/name/line">line</a> <a href="#//api/name/mode">mode</a>.
+Only valid if in visual <a href="#//api/name/mode">mode</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) BOOL visual_line_mode</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+
+					
+
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/caret" title="caret"></a>
+	<h3 class="subsubtitle method-title">caret</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The location of the <a href="#//api/name/caret">caret</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)caret</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The location of the <a href="#//api/name/caret">caret</a>.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/characterAtIndex:" title="characterAtIndex:"></a>
+	<h3 class="subsubtitle method-title">characterAtIndex:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Get the character at a location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (unichar)characterAtIndex:(NSUInteger)<em>location</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>location</em></dt>
+			<dd><p>The location to check.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The character at the given location, or 0 if location is invalid.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/currentCharacter" title="currentCharacter"></a>
+	<h3 class="subsubtitle method-title">currentCharacter</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The character under the <a href="#//api/name/caret">caret</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (unichar)currentCharacter</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The character under the <a href="#//api/name/caret">caret</a>.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/currentColumn" title="currentColumn"></a>
+	<h3 class="subsubtitle method-title">currentColumn</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The current column.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)currentColumn</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The current column.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/currentLine" title="currentLine"></a>
+	<h3 class="subsubtitle method-title">currentLine</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The current <a href="#//api/name/line">line</a> number.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)currentLine</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The current <a href="#//api/name/line">line</a> number.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/currentScreenColumn" title="currentScreenColumn"></a>
+	<h3 class="subsubtitle method-title">currentScreenColumn</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The current screen column. This may be different from <a href="#//api/name/currentColumn">currentColumn</a> if <a href="#//api/name/line">line</a> wrapping is in effect.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)currentScreenColumn</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The current screen column. This may be different from <a href="#//api/name/currentColumn">currentColumn</a> if <a href="#//api/name/line">line</a> wrapping is in effect.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/cutToRegister:range:" title="cutToRegister:range:"></a>
+	<h3 class="subsubtitle method-title">cutToRegister:range:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Cut text to a register.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)cutToRegister:(unichar)<em>regName</em> range:(NSRange)<em>cutRange</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>regName</em></dt>
+			<dd><p>The name of the register to cut to.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>cutRange</em></dt>
+			<dd><p>The range of text to cut.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="../Classes/ViRegisterManager.html">ViRegisterManager</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/deleteRange:" title="deleteRange:"></a>
+	<h3 class="subsubtitle method-title">deleteRange:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Delete a range of text.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)deleteRange:(NSRange)<em>aRange</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aRange</em></dt>
+			<dd><p>The range to delete.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/environment" title="environment"></a>
+	<h3 class="subsubtitle method-title">environment</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Bundle <a href="#//api/name/environment">environment</a> variables.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSDictionary *)environment</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>Bundle <a href="#//api/name/environment">environment</a> variables.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/gotoColumn:fromLocation:" title="gotoColumn:fromLocation:"></a>
+	<h3 class="subsubtitle method-title">gotoColumn:fromLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Go to a specific column.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)gotoColumn:(NSUInteger)<em>column</em> fromLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>column</em></dt>
+			<dd><p>The column to go to. Zero-based.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>A location on the <a href="#//api/name/line">line</a>.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/gotoLine:column:" title="gotoLine:column:"></a>
+	<h3 class="subsubtitle method-title">gotoLine:column:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Go to a specific <a href="#//api/name/line">line</a> and column.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)gotoLine:(NSUInteger)<em>line</em> column:(NSUInteger)<em>column</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>line</em></dt>
+			<dd><p>The <a href="#//api/name/line">line</a> number to go to. One-based.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>column</em></dt>
+			<dd><p>The column to go to. Zero-based.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the position was valid.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/input:" title="input:"></a>
+	<h3 class="subsubtitle method-title">input:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Input a string of keys as a macro.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)input:(NSString *)<em>inputString</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>inputString</em></dt>
+			<dd><p>A key sequence, can include special keys, see <a href="../Classes/ViMap.html">ViMap</a>.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the macro evaluated successfully.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/insertNewlineAtLocation:indentForward:" title="insertNewlineAtLocation:indentForward:"></a>
+	<h3 class="subsubtitle method-title">insertNewlineAtLocation:indentForward:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Insert new<a href="#//api/name/line">line</a> and indent.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSUInteger)insertNewlineAtLocation:(NSUInteger)<em>aLocation</em> indentForward:(BOOL)<em>indentForward</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location of the new<a href="#//api/name/line">line</a> character to insert.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>indentForward</em></dt>
+			<dd><p>YES if the <a href="#//api/name/line">line</a> following the new<a href="#//api/name/line">line</a> should be indented.
+NO if the <a href="#//api/name/line">line</a> preceding the new<a href="#//api/name/line">line</a> should be indented.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>Returns <code>aLocation</code> adjusted for automatic indentation.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/insertSnippet:" title="insertSnippet:"></a>
+	<h3 class="subsubtitle method-title">insertSnippet:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Insert a snippet at the current location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViSnippet *)insertSnippet:(NSString *)<em>snippetString</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>snippetString</em></dt>
+			<dd><p>The snippet to insert.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/insertSnippet:atLocation:" title="insertSnippet:atLocation:"></a>
+	<h3 class="subsubtitle method-title">insertSnippet:atLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Insert a snippet at a given location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViSnippet *)insertSnippet:(NSString *)<em>snippetString</em> atLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>snippetString</em></dt>
+			<dd><p>The snippet to insert.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location to insert the snippet. Zero-based.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/insertSnippet:inRange:" title="insertSnippet:inRange:"></a>
+	<h3 class="subsubtitle method-title">insertSnippet:inRange:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Insert a snippet, replacing the trigger word.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViSnippet *)insertSnippet:(NSString *)<em>snippetString</em> inRange:(NSRange)<em>aRange</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>snippetString</em></dt>
+			<dd><p>The snippet to insert.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aRange</em></dt>
+			<dd><p>The range of the trigger word to replace.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/insertString:" title="insertString:"></a>
+	<h3 class="subsubtitle method-title">insertString:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Insert a string at the current location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)insertString:(NSString *)<em>aString</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aString</em></dt>
+			<dd><p>The string to insert.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/insertString:atLocation:" title="insertString:atLocation:"></a>
+	<h3 class="subsubtitle method-title">insertString:atLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Insert a string at a location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)insertString:(NSString *)<em>aString</em> atLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aString</em></dt>
+			<dd><p>The string to insert.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location where the string will be inserted. Zero-based.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/line" title="line"></a>
+	<h3 class="subsubtitle method-title">line</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The content of the current <a href="#//api/name/line">line</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSString *)line</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The content of the current <a href="#//api/name/line">line</a>.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/markNamed:" title="markNamed:"></a>
+	<h3 class="subsubtitle method-title">markNamed:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Lookup a marked location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViMark *)markNamed:(unichar)<em>markName</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>markName</em></dt>
+			<dd><p>The name of the mark.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The named mark, or <code>nil</code> if not set.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/popUpContextMenu:" title="popUpContextMenu:"></a>
+	<h3 class="subsubtitle method-title">popUpContextMenu:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Show a popup menu at the carets location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)popUpContextMenu:(NSMenu *)<em>menu</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>menu</em></dt>
+			<dd><p>The menu to display.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/preference:" title="preference:"></a>
+	<h3 class="subsubtitle method-title">preference:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>A bundle preference at the current location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (id)preference:(NSString *)<em>name</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>name</em></dt>
+			<dd><p>The name of the Bundle Preference (eg, <code>shellVariables</code>)</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>A bundle preference at the current location.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/preference:atLocation:" title="preference:atLocation:"></a>
+	<h3 class="subsubtitle method-title">preference:atLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>A bundle preference at a given location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (id)preference:(NSString *)<em>name</em> atLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>name</em></dt>
+			<dd><p>The name of the Bundle Preference (eg, <code>shellVariables</code>)</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location where the preference should be valid.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>A bundle preference at a given location.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/replaceRange:withString:" title="replaceRange:withString:"></a>
+	<h3 class="subsubtitle method-title">replaceRange:withString:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Replace a range of text with a string.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)replaceRange:(NSRange)<em>aRange</em> withString:(NSString *)<em>aString</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aRange</em></dt>
+			<dd><p>The range to replace.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aString</em></dt>
+			<dd><p>The replacement string.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/scrollToCaret" title="scrollToCaret"></a>
+	<h3 class="subsubtitle method-title">scrollToCaret</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Scroll the view to the <a href="#//api/name/caret">caret</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)scrollToCaret</code></div>
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Makes sure the <a href="#//api/name/caret">caret</a> is visible.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setCaret:" title="setCaret:"></a>
+	<h3 class="subsubtitle method-title">setCaret:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Set the location of the <a href="#//api/name/caret">caret</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setCaret:(NSUInteger)<em>location</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>location</em></dt>
+			<dd><p>The location of the <a href="#//api/name/caret">caret</a>. Zero-based.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setInsertMode" title="setInsertMode"></a>
+	<h3 class="subsubtitle method-title">setInsertMode</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Set insert <a href="#//api/name/mode">mode</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setInsertMode</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setMark:atLocation:" title="setMark:atLocation:"></a>
+	<h3 class="subsubtitle method-title">setMark:atLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Set a mark.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setMark:(unichar)<em>name</em> atLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>name</em></dt>
+			<dd><p>The name of the mark.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location to mark.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setNormalMode" title="setNormalMode"></a>
+	<h3 class="subsubtitle method-title">setNormalMode</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Set normal <a href="#//api/name/mode">mode</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setNormalMode</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setVisualMode" title="setVisualMode"></a>
+	<h3 class="subsubtitle method-title">setVisualMode</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Set visual <a href="#//api/name/mode">mode</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setVisualMode</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/textStorage" title="textStorage"></a>
+	<h3 class="subsubtitle method-title">textStorage</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The associated <a href="../Classes/ViTextStorage.html">ViTextStorage</a> object.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViTextStorage *)textStorage</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The associated <a href="../Classes/ViTextStorage.html">ViTextStorage</a> object.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/yankToRegister:range:" title="yankToRegister:range:"></a>
+	<h3 class="subsubtitle method-title">yankToRegister:range:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Copying text to a register.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)yankToRegister:(unichar)<em>regName</em> range:(NSRange)<em>yankRange</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>regName</em></dt>
+			<dd><p>The name of the register to copy to.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>yankRange</em></dt>
+			<dd><p>The range of text to copy.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="../Classes/ViRegisterManager.html">ViRegisterManager</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTextView.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2011 Martin Hedenfalk. All rights reserved. (Last updated: 2011-08-29)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.0.4 (build 703)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+
+					window.name = "";
+				}
+				return false;
+			}
+
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+
+				var tocList = document.getElementById('toc');
+
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+
+			window.onload = init;
+		</script>
+	</body>
+</html>

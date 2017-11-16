@@ -1,0 +1,1125 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>ViEventManager Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.0.4 (build 703)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">Vico API </a></h1>
+				
+			</div>
+
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">ViEventManager Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+
+	
+	<option value="class_methods">Class Methods</option>
+	
+	<option value="//api/name/defaultManager">&nbsp;&nbsp;&nbsp;&nbsp;+ defaultManager</option>
+	
+	
+
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/clear">&nbsp;&nbsp;&nbsp;&nbsp;- clear</option>
+	
+	<option value="//api/name/clear:">&nbsp;&nbsp;&nbsp;&nbsp;- clear:</option>
+	
+	<option value="//api/name/clear:for:">&nbsp;&nbsp;&nbsp;&nbsp;- clear:for:</option>
+	
+	<option value="//api/name/clearFor:">&nbsp;&nbsp;&nbsp;&nbsp;- clearFor:</option>
+	
+	<option value="//api/name/emit:for:withArguments:">&nbsp;&nbsp;&nbsp;&nbsp;- emit:for:withArguments:</option>
+	
+	<option value="//api/name/emitDelayed:for:withArguments:">&nbsp;&nbsp;&nbsp;&nbsp;- emitDelayed:for:withArguments:</option>
+	
+	<option value="//api/name/on:by:do:">&nbsp;&nbsp;&nbsp;&nbsp;- on:by:do:</option>
+	
+	<option value="//api/name/on:do:">&nbsp;&nbsp;&nbsp;&nbsp;- on:do:</option>
+	
+	<option value="//api/name/remove:">&nbsp;&nbsp;&nbsp;&nbsp;- remove:</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Emitting events">Emitting events</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Registering event handlers">Registering event handlers</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Removing event handlers">Removing event handlers</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#class_methods">Class Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/defaultManager">defaultManager</a></span></li>
+	
+</ul></li>
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/clear">clear</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/clear:">clear:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/clear:for:">clear:for:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/clearFor:">clearFor:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/emit:for:withArguments:">emit:for:withArguments:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/emitDelayed:for:withArguments:">emitDelayed:for:withArguments:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/on:by:do:">on:by:do:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/on:do:">on:do:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/remove:">remove:</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="ViEventManager Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">ViEventManager Class Reference</h1>
+					</div>
+				</div>
+				<div id="container">
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSObject</td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">ViEventManager.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>The event manager is used to automatically run code when specific
+events occur. An event handler is defined as a Nu function, typically
+an anonymous function created with the Nu <code>do</code> operator. An event
+handler will receive zero or more arguments, depending on the event.
+Any return value is ignored.</p>
+
+<p>The standard events are described below.</p>
+
+<h2>Constants</h2>
+
+<h3>Standard event names</h3>
+
+<h4>Document Controller events</h4>
+
+<dl class="termdef">
+<dt><code>didFinishLaunching</code></dt>
+<dd>
+<p>Emitted when Vico has finished launching.</p>
+<p>arguments: <em>none</em></p>
+</dd>
+
+<dt><code>willResignActive</code></dt>
+<dd>
+<p>Emitted when Vico resigns active state (ie, loses focus).</p>
+<p>arguments: <em>none</em></p>
+</dd>
+
+<dt><code>didBecomeActive</code></dt>
+<dd>
+<p>Emitted when Vico becomes active (ie, regains focus).</p>
+<p>arguments: <em>none</em></p>
+</dd>
+
+<dt><code>didAddDocument</code></dt>
+<dd>
+<p>Emitted when a new document is opened.</p>
+<p>arguments: <em>document</em></p>
+</dd>
+
+<dt><code>didRemoveDocument</code></dt>
+<dd>
+<p>Emitted when a document is closed.</p>
+<p>arguments: <em>document</em></p>
+</dd>
+</dl>
+
+
+<h4>Document events</h4>
+
+<dl class="termdef">
+<dt><code>willChangeURL</code></dt>
+<dd>
+<p>Emitted before a document changes it's URL.</p>
+<p>arguments: <em>document, url</em></p>
+</dd>
+
+<dt><code>didChangeURL</code></dt>
+<dd>
+<p>Emitted after a document changed it's URL.</p>
+<p>arguments: <em>document, url</em></p>
+</dd>
+
+<dt><code>willLoadDocument</code></dt>
+<dd>
+<p>Emitted before a document is loaded.</p>
+<p>arguments: <em>document, url</em></p>
+</dd>
+
+<dt><code>didLoadDocument</code></dt>
+<dd>
+<p>Emitted after a document was loaded.</p>
+<p>arguments: <em>document</em></p>
+</dd>
+
+<dt><code>willSaveDocument</code></dt>
+<dd>
+<p>Emitted before a document is being saved.</p>
+<p>arguments: <em>document</em></p>
+</dd>
+
+<dt><code>didSaveDocument</code></dt>
+<dd>
+<p>Emitted after a document was saved.</p>
+<p>arguments: <em>document</em></p>
+</dd>
+
+<dt><code>willSaveAsDocument</code></dt>
+<dd>
+<p>Emitted before a document is being saved at a new URL.</p>
+<p>arguments: <em>document, url</em></p>
+</dd>
+
+<dt><code>didSaveAsDocument</code></dt>
+<dd>
+<p>Emitted after a document was saved at a new URL.</p>
+<p>arguments: <em>document, url</em></p>
+</dd>
+
+<dt><code>willCloseDocument</code></dt>
+<dd>
+<p>Emitted before a document is closed.</p>
+<p>arguments: <em>document</em></p>
+</dd>
+
+<dt><code>didCloseDocument</code></dt>
+<dd>
+<p>Emitted after a document was closed.</p>
+<p>arguments: <em>document</em></p>
+</dd>
+
+<dt><code>didModifyDocument</code></dt>
+<dd>
+<p>Emitted after a document was modified.</p>
+<p>arguments: <em>document, range, delta</em></p>
+</dd>
+
+<dt><code>didMakeView</code></dt>
+<dd>
+<p>Emitted after a new document view was created.</p>
+<p>arguments: <em>document, view, text</em></p>
+</dd>
+
+<dt><code>willChangeSyntax</code></dt>
+<dd>
+<p>Emitted before a document changes language syntax.</p>
+<p>arguments: <em>document, language</em></p>
+</dd>
+
+<dt><code>didChangeSyntax</code></dt>
+<dd>
+<p>Emitted after a document changed language syntax.</p>
+<p>arguments: <em>document, language</em></p>
+</dd>
+</dl>
+
+
+<h4>Text events</h4>
+
+<dl class="termdef">
+<dt><code>caretDidMove</code></dt>
+<dd>
+<p>Emitted after the caret has changed in a text view.</p>
+<p>arguments: <em>text</em></p>
+</dd>
+</dl>
+
+
+<h4>Window events</h4>
+
+<dl class="termdef">
+<dt><code>willSelectDocument</code></dt>
+<dd>
+<p>Emitted before the selected document is changed in a window.</p>
+<p>arguments: <em>window, document</em></p>
+</dd>
+
+<dt><code>didSelectDocument</code></dt>
+<dd>
+<p>Emitted after the selected document was changed in a window.</p>
+<p>arguments: <em>window, document</em></p>
+</dd>
+
+<dt><code>willSelectView</code></dt>
+<dd>
+<p>Emitted before the selected view is changed in a window.</p>
+<p>arguments: <em>window, view</em></p>
+</dd>
+
+<dt><code>didSelectView</code></dt>
+<dd>
+<p>Emitted after the selected view was changed in a window.</p>
+<p>arguments: <em>window, view</em></p>
+</dd>
+
+<dt><code>willSelectTab</code></dt>
+<dd>
+<p>Emitted before the selected tab is changed in a window.</p>
+<p>arguments: <em>window, tab controller</em></p>
+</dd>
+
+<dt><code>didSelectTab</code></dt>
+<dd>
+<p>Emitted after the selected tab was changed in a window.</p>
+<p>arguments: <em>window, tab controller</em></p>
+</dd>
+</dl>
+
+
+<h4>Tab Controller events</h4>
+
+<dl class="termdef">
+<dt><code>didAddView</code></dt>
+<dd>
+<p>Emitted after a view was added to a tab.</p>
+<p>arguments: <em>view</em></p>
+</dd>
+
+<dt><code>didCloseView</code></dt>
+<dd>
+<p>Emitted after a view was removed from a tab.</p>
+<p>arguments: <em>view</em></p>
+</dd>
+</dl>
+
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+
+						
+						<h3 class="subsubtitle task-title">Other Methods</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/defaultManager">+&nbsp;defaultManager</a></code>
+		<span class="tooltip"><p>The default global event manager.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Emitting events" name="task_Emitting events"></a>
+						<h3 class="subsubtitle task-title">Emitting events</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/emit:for:withArguments:">&ndash;&nbsp;emit:for:withArguments:</a></code>
+		<span class="tooltip"><p>Emit an event immediately.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/emitDelayed:for:withArguments:">&ndash;&nbsp;emitDelayed:for:withArguments:</a></code>
+		<span class="tooltip"><p>Emit an event in the next run loop iteration.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Registering event handlers" name="task_Registering event handlers"></a>
+						<h3 class="subsubtitle task-title">Registering event handlers</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/on:by:do:">&ndash;&nbsp;on:by:do:</a></code>
+		<span class="tooltip"><p>Register a handler for an event by a specific object.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/on:do:">&ndash;&nbsp;on:do:</a></code>
+		<span class="tooltip"><p>Register an event handler.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Removing event handlers" name="task_Removing event handlers"></a>
+						<h3 class="subsubtitle task-title">Removing event handlers</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/clear:for:">&ndash;&nbsp;clear:for:</a></code>
+		<span class="tooltip"><p>Remove all events handlers for a specific object.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/clear:">&ndash;&nbsp;clear:</a></code>
+		<span class="tooltip"><p>Remove all handlers for an event.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/clearFor:">&ndash;&nbsp;clearFor:</a></code>
+		<span class="tooltip"><p>Remove all handlers for an object.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/clear">&ndash;&nbsp;clear</a></code>
+		<span class="tooltip"><p>Remove all handlers for all events.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/remove:">&ndash;&nbsp;remove:</a></code>
+		<span class="tooltip"><p>Remove an event handler.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+
+					
+					
+
+					
+					<div class="section section-methods">
+						<a title="Class Methods" name="class_methods"></a>
+						<h2 class="subtitle subtitle-methods">Class Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/defaultManager" title="defaultManager"></a>
+	<h3 class="subsubtitle method-title">defaultManager</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The default global event manager.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViEventManager *)defaultManager</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The default global event manager.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/clear" title="clear"></a>
+	<h3 class="subsubtitle method-title">clear</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Remove all handlers for all events.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)clear</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/clear:" title="clear:"></a>
+	<h3 class="subsubtitle method-title">clear:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Remove all handlers for an event.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)clear:(NSString *)<em>event</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>event</em></dt>
+			<dd><p>The name of the event; cannot be <code>nil</code>.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/clear:for:" title="clear:for:"></a>
+	<h3 class="subsubtitle method-title">clear:for:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Remove all events handlers for a specific object.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)clear:(NSString *)<em>event</em> for:(id)<em>owner</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>event</em></dt>
+			<dd><p>The name of the event; cannot be <code>nil</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>owner</em></dt>
+			<dd><p>The object that is responsible for emitting the event.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/clearFor:" title="clearFor:"></a>
+	<h3 class="subsubtitle method-title">clearFor:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Remove all handlers for an object.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)clearFor:(id)<em>owner</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>owner</em></dt>
+			<dd><p>The object that is responsible for emitting the event.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/emit:for:withArguments:" title="emit:for:withArguments:"></a>
+	<h3 class="subsubtitle method-title">emit:for:withArguments:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Emit an event immediately.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)emit:(NSString *)<em>event</em> for:(id)<em>owner</em> withArguments:(id)<em>arguments</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>event</em></dt>
+			<dd><p>The name of the event; cannot be <code>nil</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>owner</em></dt>
+			<dd><p>The object that is responsible for emitting the event.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>arguments</em></dt>
+			<dd><p>The arguments to the event handler. Can either be an NSArray or a Nu list.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>You should not manually emit any of the standard events.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/emitDelayed:for:withArguments:" title="emitDelayed:for:withArguments:"></a>
+	<h3 class="subsubtitle method-title">emitDelayed:for:withArguments:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Emit an event in the next run loop iteration.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)emitDelayed:(NSString *)<em>event</em> for:(id)<em>owner</em> withArguments:(id)<em>arguments</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>event</em></dt>
+			<dd><p>The name of the event; cannot be <code>nil</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>owner</em></dt>
+			<dd><p>The object that is responsible for emitting the event.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>arguments</em></dt>
+			<dd><p>The arguments to the event handler. Can either be an NSArray or a Nu list.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>You should not manually emit any of the standard events.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/on:by:do:" title="on:by:do:"></a>
+	<h3 class="subsubtitle method-title">on:by:do:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Register a handler for an event by a specific object.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSInteger)on:(NSString *)<em>event</em> by:(id)<em>owner</em> do:(NuBlock *)<em>expression</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>event</em></dt>
+			<dd><p>The name of the event; cannot be <code>nil</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>owner</em></dt>
+			<dd><p>The object that emitted the event.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>expression</em></dt>
+			<dd><p>A Nu anonymous function (<code>do</code> block). See the <a href="http://programming.nu/operators#functions">Nu documentation</a>.
+The number of arguments to the function must match the number of arguments emitted.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>A unique event ID.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>This event handler is called whenever the <code>event</code> is emitted by the
+<code>owner</code> object.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/remove:">&ndash; remove:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/on:do:" title="on:do:"></a>
+	<h3 class="subsubtitle method-title">on:do:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Register an event handler.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSInteger)on:(NSString *)<em>event</em> do:(NuBlock *)<em>expression</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>event</em></dt>
+			<dd><p>The name of the event; cannot be <code>nil</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>expression</em></dt>
+			<dd><p>A Nu anonymous function (<code>do</code> block). See the <a href="http://programming.nu/operators#functions">Nu documentation</a>.
+The number of arguments to the function must match the number of arguments emitted.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>A unique event ID.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>This event handler is called whenever the <code>event</code> is emitted,
+regardless of the emitting object.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/on:by:do:">&ndash; on:by:do:</a></p></code></li>
+			
+			<li><code><p><a href="#//api/name/remove:">&ndash; remove:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/remove:" title="remove:"></a>
+	<h3 class="subsubtitle method-title">remove:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Remove an event handler.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)remove:(NSInteger)<em>eventId</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>eventId</em></dt>
+			<dd><p>An event ID as returned by <a href="#//api/name/on:by:do:">on:by:do:</a>.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViEventManager.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2011 Martin Hedenfalk. All rights reserved. (Last updated: 2011-08-23)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.0.4 (build 703)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+
+					window.name = "";
+				}
+				return false;
+			}
+
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+
+				var tocList = document.getElementById('toc');
+
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+
+			window.onload = init;
+		</script>
+	</body>
+</html>

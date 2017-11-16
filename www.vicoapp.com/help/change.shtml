@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Changing text</title>
+  <script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-344189-7']);
+  _gaq.push(['_trackPageview']);
+ (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+  
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Changing text</h1>
+
+<p>The <kbd>c</kbd> (change) <a href="operators.shtml">operator</a> deletes the affected text
+and enters insert mode. The <kbd>cw</kbd> is one of the most used commands: it
+changes one word. The change command is not considered complete until you exit
+insert mode with <kbd>&#x238B;</kbd> (escape). Back in normal mode, you can
+repeat the change with the <a href="dot.shtml">dot command</a>.</p>
+
+<p>The (uppercase) <kbd>C</kbd> command deletes from the current location
+to the end of the line, and then enters insert mode. It is the same as
+<kbd>c$</kbd>.</p>
+
+<p>Use the <kbd>r</kbd> (replace) command to change a single character. Vico waits
+for you to type the new character. In <a href="visual.shtml">visual mode</a>, the
+<kbd>r</kbd> command changes the whole selection to the same character.</p>
+
+<p>The <kbd>s</kbd> (substitute) command replaces one, or, given a count,
+that many characters and then enters insert mode. The uppercase variant
+<kbd>S</kbd> is line-oriented and replaces one or more lines.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Visual mode</title>
+  <script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-344189-7']);
+  _gaq.push(['_trackPageview']);
+ (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="../index.html"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="../index.html">home</a>
+        <a href="../download.html">download</a>
+        
+        <a href="index.html">help</a>
+        <a href="../api/index.html">api</a>
+      </p>
+    </header>
+    <div id="main">
+
+<h1>Visual mode</h1>
+
+<p>When you select text in Vico, you enter visual mode. This is similar to normal
+mode in that keys act as commands. They do not replace the selected text (you
+must use the <a href="change.html">change</a> command for that).</p>
+
+<p>Commands that require a motion (<a href="operators.html">operators</a>) instead use the
+selected text directly.</p>
+
+<p>You can select text by dragging with the mouse, or with the <kbd>v</kbd> and
+<kbd>V</kbd> commands. The latter enters visual <strong>line mode</strong>, where only
+whole lines are selected. The selection is extended by moving around with the
+regular <a href="movement.html">movement</a> commands.</p>
+
+<p>You can toggle between visual line mode and character mode by pressing
+<kbd>v</kbd> while in line mode, or <kbd>V</kbd> while in visual character mode.</p>
+
+<p>Press <kbd>&#x238B;</kbd> (escape) to cancel the selection and go back to normal
+mode.</p>
+
+    </div>
+  </div>
+  <footer>
+  </footer>
+</body>
+</html>

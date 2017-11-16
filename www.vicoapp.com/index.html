@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="css/vicoapp.css" />
+  <title>About Vico</title>
+  <script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-344189-7']);
+  _gaq.push(['_trackPageview']);
+ (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+  <script src="fancybox/jquery.easing-1.3.pack.js"></script>
+  <script src="fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+  <link rel="stylesheet" type="text/css" href="fancybox/jquery.fancybox-1.3.4.css" media="screen" />
+  <script>
+  $(document).ready(function() {
+    $("a[rel=screenshots]").fancybox({
+      'transitionIn'	: 'elastic',
+      'transitionOut'	: 'elastic',
+      'easingIn'	: 'easeInBack',
+      'easingOut'	: 'easeInBack',
+      'titlePosition' : 'over'
+    });
+  });
+  </script>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="index.html"><img src="img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="index.html">home</a>
+        <a href="download.html">download</a>
+        <!--a href="http://help.vicoapp.com/">feedback</a-->
+        <a href="help/index.html">help</a>
+        <a href="api/index.html">api</a>
+      </p>
+    </header>
+    <div id="main">
+
+  <p>
+    Vico is a programmers text editor with a strong focus on keyboard
+    control. Vico uses vi key bindings to let you keep your fingers on
+    the home row and work effectively with your text.
+  </p>
+
+  <p>
+    Vico comes with support for the most common languages, such as html,
+    php, ruby and javascript. And since Vico can use existing TextMate
+    bundles, it's easy to add more.
+  </p>
+
+  <p>
+    Vico also features integrated SFTP for working with remote files, split
+    views to let you edit files side-by-side and a file explorer for fast
+    project navigation.
+  </p>
+
+  <p>
+    Quickly navigate between files using fuzzy find, or open files directly
+    from the ex command line with tab completion. Jumping to symbols is easy
+    with the symbol list, or use ctags to find the definition under the
+    cursor. Ctags even works remotely over SFTP.
+  </p>
+
+  <p>
+    Vico is scriptable in the <a href="http://programming.nu/">Nu</a> language.
+  </p>
+
+  <p>
+    <a rel="screenshots" href="img/split.png" title="Split screens"><img alt="" src="img/split_small.jpg" /></a>
+    <a rel="screenshots" href="img/sidebar.png" title="Sidebar with file explorer and context menu with bundle commands"><img alt="" src="img/sidebar_small.jpg" /></a>
+    <a rel="screenshots" href="img/symlist.png" title="Symbol list"><img alt="" src="img/symlist_small.jpg" /></a>
+  </p>
+  <p class="caption">
+    Click images to see a larger version.
+  </p>
+
+    </div>
+  </div>
+
+  <footer>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Working with split views</title>
+  
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Working with split views</h1>
+
+<p>Vico can show the same or different documents side by side in split views.
+Views can be split either horizontally or vertically. There is no limit on the
+number of splits you can create, but more than a couple in the same tab tends to
+be hard to manage.</p>
+
+<p>Most keys that manages split views begin with <kbd>&lt;ctrl-w&gt;</kbd>.
+To split the current view, use the <kbd>&lt;ctrl-w&gt;s</kbd> command, ie first
+press <kbd>&lt;ctrl-w&gt;</kbd> and then press the <kbd>s</kbd> key. If you use
+<kbd>v</kbd> instead, you get a vertical split.</p>
+
+<p>If you want to move a split view to a new tab, use <kbd>&lt;ctrl-w&gt;T</kbd>.</p>
+
+<p>To navigate between split views, use <kbd>&lt;ctrl-w&gt;</kbd> followed
+by a vi motion key (<kbd>hjkl</kbd>) or one of the arrow keys. The
+<kbd>&lt;ctrl-w&gt;w</kbd> command moves to the next split view. The
+<kbd>&lt;ctrl-w&gt;W</kbd> moves to the previous split view. Use
+<kbd>&lt;ctrl-w&gt;p</kbd> to toggle between the last focused split view.</p>
+
+<p>The <a href="explorer.shtml">explorer</a> and <a href="symbols.shtml">symbol list</a> can also be used
+to open files or symbols in split views.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

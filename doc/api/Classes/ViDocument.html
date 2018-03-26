@@ -1,0 +1,891 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>ViDocument Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.0.4 (build 703)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">Vico API </a></h1>
+				
+			</div>
+
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">ViDocument Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+	<option value="properties">Properties</option>
+	
+	<option value="//api/name/textStorage">&nbsp;&nbsp;&nbsp;&nbsp;textStorage</option>
+	
+	<option value="//api/name/views">&nbsp;&nbsp;&nbsp;&nbsp;views</option>
+	
+	
+
+	
+
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/addView:">&nbsp;&nbsp;&nbsp;&nbsp;- addView:</option>
+	
+	<option value="//api/name/bestMatchingScope:atLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- bestMatchingScope:atLocation:</option>
+	
+	<option value="//api/name/cloneView:">&nbsp;&nbsp;&nbsp;&nbsp;- cloneView:</option>
+	
+	<option value="//api/name/language">&nbsp;&nbsp;&nbsp;&nbsp;- language</option>
+	
+	<option value="//api/name/makeView">&nbsp;&nbsp;&nbsp;&nbsp;- makeView</option>
+	
+	<option value="//api/name/rangeOfScopeSelector:atLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- rangeOfScopeSelector:atLocation:</option>
+	
+	<option value="//api/name/removeView:">&nbsp;&nbsp;&nbsp;&nbsp;- removeView:</option>
+	
+	<option value="//api/name/scopeAtLocation:">&nbsp;&nbsp;&nbsp;&nbsp;- scopeAtLocation:</option>
+	
+	<option value="//api/name/text">&nbsp;&nbsp;&nbsp;&nbsp;- text</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Working with scopes">Working with scopes</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#properties">Properties</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/textStorage">textStorage</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/views">views</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/addView:">addView:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/bestMatchingScope:atLocation:">bestMatchingScope:atLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/cloneView:">cloneView:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/language">language</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/makeView">makeView</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/rangeOfScopeSelector:atLocation:">rangeOfScopeSelector:atLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/removeView:">removeView:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/scopeAtLocation:">scopeAtLocation:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/text">text</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="ViDocument Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">ViDocument Class Reference</h1>
+					</div>
+				</div>
+				<div id="container">
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSDocument</td>
+</tr><tr>
+	<td class="specification-title">Conforms to</td>
+	<td class="specification-value">NSLayoutManagerDelegate<br />NSTextStorageDelegate<br />NSTextViewDelegate<br />ViDeferredDelegate<br /><a href="../Protocols/ViViewDocument.html">ViViewDocument</a></td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">ViDocument.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>A document.</p>
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+
+						
+						<h3 class="subsubtitle task-title">Other Methods</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/views">&nbsp;&nbsp;views</a></code>
+		<span class="tooltip"><p>The set of visible <a href="../Protocols/ViViewDocument.html#//api/name/views">views</a> of the document.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/textStorage">&nbsp;&nbsp;textStorage</a></code>
+		<span class="tooltip"><p>Return the <a href="../Classes/ViTextStorage.html">ViTextStorage</a> object.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/text">&ndash;&nbsp;text</a></code>
+		<span class="tooltip"><p>Return a scriptable <a href="#//api/name/text">text</a> view.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/language">&ndash;&nbsp;language</a></code>
+		<span class="tooltip"><p>Get the <a href="#//api/name/language">language</a> syntax.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/makeView">&ndash;&nbsp;makeView</a></code>
+		<span class="tooltip"><p>Create a new view of the document.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/cloneView:">&ndash;&nbsp;cloneView:</a></code>
+		<span class="tooltip"><p>Create a new view of the document by cloning an existing view.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/removeView:">&ndash;&nbsp;removeView:</a></code>
+		<span class="tooltip"><p>Remove a view from the set of visible <a href="../Protocols/ViViewDocument.html#//api/name/views">views</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/addView:">&ndash;&nbsp;addView:</a></code>
+		<span class="tooltip"><p>Add a view to the set of visible <a href="../Protocols/ViViewDocument.html#//api/name/views">views</a>.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Working with scopes" name="task_Working with scopes"></a>
+						<h3 class="subsubtitle task-title">Working with scopes</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/scopeAtLocation:">&ndash;&nbsp;scopeAtLocation:</a></code>
+		<span class="tooltip"><p>Return the scope at a given location.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/bestMatchingScope:atLocation:">&ndash;&nbsp;bestMatchingScope:atLocation:</a></code>
+		<span class="tooltip"><p>Find the best matching scope selector.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/rangeOfScopeSelector:atLocation:">&ndash;&nbsp;rangeOfScopeSelector:atLocation:</a></code>
+		<span class="tooltip"><p>Find the range where a scope selector matches.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-methods">
+						<a title="Properties" name="properties"></a>
+						<h2 class="subtitle subtitle-methods">Properties</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/textStorage" title="textStorage"></a>
+	<h3 class="subsubtitle method-title">textStorage</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Return the <a href="../Classes/ViTextStorage.html">ViTextStorage</a> object.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) ViTextStorage *textStorage</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViDocument.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/views" title="views"></a>
+	<h3 class="subsubtitle method-title">views</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The set of visible <a href="../Protocols/ViViewDocument.html#//api/name/views">views</a> of the document.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) NSSet *views</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The set of visible <a href="../Protocols/ViViewDocument.html#//api/name/views">views</a> of the document.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTabController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+
+					
+
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/addView:" title="addView:"></a>
+	<h3 class="subsubtitle method-title">addView:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Add a view to the set of visible <a href="../Protocols/ViViewDocument.html#//api/name/views">views</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)addView:(ViDocumentView *)<em>aDocumentView</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>viewController</em></dt>
+			<dd><p>The view to add.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTabController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/bestMatchingScope:atLocation:" title="bestMatchingScope:atLocation:"></a>
+	<h3 class="subsubtitle method-title">bestMatchingScope:atLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Find the best matching scope selector.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSString *)bestMatchingScope:(NSArray *)<em>scopeSelectors</em> atLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelectors</em></dt>
+			<dd><p>Scope selectors to test.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location of the scope.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The scope selector with the highest matching rank at the given location.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViDocument.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/cloneView:" title="cloneView:"></a>
+	<h3 class="subsubtitle method-title">cloneView:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Create a new view of the document by cloning an existing view.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViDocumentView *)cloneView:(ViDocumentView *)<em>oldView</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>oldView</em></dt>
+			<dd><p>The view that is being cloned.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The newly created view of the document.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>The new view is expected to inherit properties from the cloned view, such as caret location.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTabController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/language" title="language"></a>
+	<h3 class="subsubtitle method-title">language</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Get the <a href="#//api/name/language">language</a> syntax.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViLanguage *)language</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The <a href="#//api/name/language">language</a> syntax currently in use, or <code>nil</code> if no <a href="#//api/name/language">language</a> configured.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViDocument.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/makeView" title="makeView"></a>
+	<h3 class="subsubtitle method-title">makeView</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Create a new view of the document.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViDocumentView *)makeView</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The newly created view of the document.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTabController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/rangeOfScopeSelector:atLocation:" title="rangeOfScopeSelector:atLocation:"></a>
+	<h3 class="subsubtitle method-title">rangeOfScopeSelector:atLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Find the range where a scope selector matches.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (NSRange)rangeOfScopeSelector:(NSString *)<em>scopeSelector</em> atLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>Scope selectors to test.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>A location where the scope selector matches.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The whole range where the scope selector matches, possibly with different ranks.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViDocument.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/removeView:" title="removeView:"></a>
+	<h3 class="subsubtitle method-title">removeView:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Remove a view from the set of visible <a href="../Protocols/ViViewDocument.html#//api/name/views">views</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)removeView:(ViDocumentView *)<em>aDocumentView</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>viewController</em></dt>
+			<dd><p>The view to remove.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViTabController.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/scopeAtLocation:" title="scopeAtLocation:"></a>
+	<h3 class="subsubtitle method-title">scopeAtLocation:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Return the scope at a given location.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViScope *)scopeAtLocation:(NSUInteger)<em>aLocation</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aLocation</em></dt>
+			<dd><p>The location of the scope.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The scope at the given location, or nil of aLocation is not valid or no <a href="#//api/name/language">language</a> syntax available.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViDocument.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/text" title="text"></a>
+	<h3 class="subsubtitle method-title">text</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Return a scriptable <a href="#//api/name/text">text</a> view.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (ViTextView *)text</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>A scriptable <a href="#//api/name/text">text</a> view.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>The returned <a href="#//api/name/text">text</a> view is not visible.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViDocument.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2011 Martin Hedenfalk. All rights reserved. (Last updated: 2011-08-23)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.0.4 (build 703)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+
+					window.name = "";
+				}
+				return false;
+			}
+
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+
+				var tocList = document.getElementById('toc');
+
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+
+			window.onload = init;
+		</script>
+	</body>
+</html>

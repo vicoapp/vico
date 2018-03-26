@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Editing Basics</title>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Editing Basics</h1>
+
+<p>Vico is a modal editor. This means there are different modes
+in which you interact with the editor. The most fundamental modes
+are the insert mode and normal mode. Regular keys pressed while
+in insert mode causes text to be inserted. In contrast, while in
+normal mode, regular keys are attached to editing commands such as
+delete, change or copy text.</p>
+
+<p>If you have used the <kbd>vi</kbd> or <kbd>vim</kbd> text editors,
+you should feel comfortable with Vico. If this is your first encounter
+with a modal editor, you might feel a bit overwhelmed at first. But
+if you give it some time and learn the basics, you'll be rewarded with
+a highly efficient text editing tool.</p>
+
+<ul>
+<li><a href="insert.shtml">Inserting text</a></li>
+<li><a href="movement.shtml">Movement Commands</a></li>
+<li><a href="delete.shtml">Deleting text</a></li>
+<li><a href="change.shtml">Changing text</a></li>
+<li><a href="operators.shtml">Operator Commands</a></li>
+<li><a href="dot.shtml">Repeating changes</a></li>
+<li><a href="searching.shtml">Searching</a></li>
+</ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

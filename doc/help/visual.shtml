@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Visual mode</title>
+  
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Visual mode</h1>
+
+<p>When you select text in Vico, you enter visual mode. This is similar to normal
+mode in that keys act as commands. They do not replace the selected text (you
+must use the <a href="change.shtml">change</a> command for that).</p>
+
+<p>Commands that require a motion (<a href="operators.shtml">operators</a>) instead use the
+selected text directly.</p>
+
+<p>You can select text by dragging with the mouse, or with the <kbd>v</kbd> and
+<kbd>V</kbd> commands. The latter enters visual <strong>line mode</strong>, where only
+whole lines are selected. The selection is extended by moving around with the
+regular <a href="movement.shtml">movement</a> commands.</p>
+
+<p>You can toggle between visual line mode and character mode by pressing
+<kbd>v</kbd> while in line mode, or <kbd>V</kbd> while in visual character mode.</p>
+
+<p>Press <kbd>&#x238B;</kbd> (escape) to cancel the selection and go back to normal
+mode.</p>
+    </div>
+  </div>
+
+  <footer>
+  </footer>
+
+</body>
+</html>
+

@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Ex command ranges</title>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Ex command ranges</h1>
+
+<p>Many <a href="ex_cmds.shtml">ex commands</a> accept a range of lines to operate
+upon. The range precede the command name and consists of zero, one or
+two line addresses separated with comma. </p>
+
+<p>A line address can be written as:</p>
+
+<ul>
+<li>an absolute line number, ie <kbd>3</kbd></li>
+<li><kbd>$</kbd> denotes the last line</li>
+<li><kbd>.</kbd> (a dot) referes to the current line</li>
+<li>a mark (eg <kbd>'x</kbd>)</li>
+<li><kbd>%</kbd> denotes all lines, same as <kbd>1,$</kbd></li>
+<li>a forward search pattern, delimited by slashes, eg <kbd>/foo/</kbd></li>
+<li>a backward search pattern, delimited by question marks, eg <kbd>?foo?</kbd></li>
+</ul>
+
+<p>Additionally, a line offset may be appended to a line address with
+<kbd>+</kbd> or <kbd>-</kbd>. For example, <kbd>.+2</kbd> means two
+lines after the current line.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

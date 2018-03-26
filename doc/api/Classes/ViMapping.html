@@ -1,0 +1,955 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>ViMapping Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.0.4 (build 703)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">Vico API </a></h1>
+				
+			</div>
+
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">ViMapping Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+	<option value="properties">Properties</option>
+	
+	<option value="//api/name/action">&nbsp;&nbsp;&nbsp;&nbsp;action</option>
+	
+	<option value="//api/name/expression">&nbsp;&nbsp;&nbsp;&nbsp;expression</option>
+	
+	<option value="//api/name/keySequence">&nbsp;&nbsp;&nbsp;&nbsp;keySequence</option>
+	
+	<option value="//api/name/keyString">&nbsp;&nbsp;&nbsp;&nbsp;keyString</option>
+	
+	<option value="//api/name/macro">&nbsp;&nbsp;&nbsp;&nbsp;macro</option>
+	
+	<option value="//api/name/parameter">&nbsp;&nbsp;&nbsp;&nbsp;parameter</option>
+	
+	<option value="//api/name/recursive">&nbsp;&nbsp;&nbsp;&nbsp;recursive</option>
+	
+	<option value="//api/name/scopeSelector">&nbsp;&nbsp;&nbsp;&nbsp;scopeSelector</option>
+	
+	
+
+	
+
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/isAction">&nbsp;&nbsp;&nbsp;&nbsp;- isAction</option>
+	
+	<option value="//api/name/isExpression">&nbsp;&nbsp;&nbsp;&nbsp;- isExpression</option>
+	
+	<option value="//api/name/isLineMode">&nbsp;&nbsp;&nbsp;&nbsp;- isLineMode</option>
+	
+	<option value="//api/name/isMacro">&nbsp;&nbsp;&nbsp;&nbsp;- isMacro</option>
+	
+	<option value="//api/name/isMotion">&nbsp;&nbsp;&nbsp;&nbsp;- isMotion</option>
+	
+	<option value="//api/name/isOperator">&nbsp;&nbsp;&nbsp;&nbsp;- isOperator</option>
+	
+	<option value="//api/name/needsArgument">&nbsp;&nbsp;&nbsp;&nbsp;- needsArgument</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Getting mapping attributes">Getting mapping attributes</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#properties">Properties</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/action">action</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/expression">expression</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/keySequence">keySequence</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/keyString">keyString</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/macro">macro</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/parameter">parameter</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/recursive">recursive</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/scopeSelector">scopeSelector</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/isAction">isAction</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/isExpression">isExpression</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/isLineMode">isLineMode</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/isMacro">isMacro</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/isMotion">isMotion</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/isOperator">isOperator</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/needsArgument">needsArgument</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="ViMapping Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">ViMapping Class Reference</h1>
+					</div>
+				</div>
+				<div id="container">
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSObject</td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">ViMap.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>A mapping of a key sequence to an editor <a href="#//api/name/action">action</a>, <a href="#//api/name/macro">macro</a> or Nu <a href="#//api/name/expression">expression</a>.</p>
+
+<p>New mappings are created in a <a href="../Classes/ViMap.html">ViMap</a>.</p>
+
+<h2>Constants</h2>
+
+<h3>Map flags</h3>
+
+<ul>
+<li><code>ViMapSetsDot</code>: This command sets the dot command</li>
+<li><code>ViMapNeedMotion</code>: This command needs a following motion command (ie, it&rsquo;s an operator)</li>
+<li><code>ViMapIsMotion</code>: This is a motion command</li>
+<li><code>ViMapLineMode</code>: This command operates on whole lines</li>
+<li><code>ViMapNeedArgument</code>: This command needs a following character argument</li>
+</ul>
+
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+
+						<a title="Getting mapping attributes" name="task_Getting mapping attributes"></a>
+						
+<h3 class="subsubtitle task-title">Getting mapping attributes</h3>
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/scopeSelector">&nbsp;&nbsp;scopeSelector</a></code>
+		<span class="tooltip"><p>The scope this mapping applies to.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/keyString">&nbsp;&nbsp;keyString</a></code>
+		<span class="tooltip"><p>A string describing the key sequence.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/keySequence">&nbsp;&nbsp;keySequence</a></code>
+		<span class="tooltip"><p>An array of NSNumbers that make up the key sequence.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/action">&nbsp;&nbsp;action</a></code>
+		<span class="tooltip"><p>The editor <a href="#//api/name/action">action</a>.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/recursive">&nbsp;&nbsp;recursive</a></code>
+		<span class="tooltip"><p>YES if this <a href="#//api/name/macro">macro</a> should be evaluated recursively.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/macro">&nbsp;&nbsp;macro</a></code>
+		<span class="tooltip"><p>A key string describing the keys that make up the <a href="#//api/name/macro">macro</a>.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/expression">&nbsp;&nbsp;expression</a></code>
+		<span class="tooltip"><p>A Nu <a href="#//api/name/expression">expression</a> <a href="#//api/name/macro">macro</a>.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/parameter">&nbsp;&nbsp;parameter</a></code>
+		<span class="tooltip"><p>Any <a href="#//api/name/parameter">parameter</a> that should be passed to the command.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/isAction">&ndash;&nbsp;isAction</a></code>
+		<span class="tooltip"><p>YES if the mapping is an editor <a href="#//api/name/action">action</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/isMacro">&ndash;&nbsp;isMacro</a></code>
+		<span class="tooltip"><p>YES if the mapping is a <a href="#//api/name/macro">macro</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/isExpression">&ndash;&nbsp;isExpression</a></code>
+		<span class="tooltip"><p>YES if the mapping is a Nu <a href="#//api/name/expression">expression</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/isOperator">&ndash;&nbsp;isOperator</a></code>
+		<span class="tooltip"><p>YES if the mapping is an operator <a href="#//api/name/action">action</a> that requires a motion component.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/isMotion">&ndash;&nbsp;isMotion</a></code>
+		<span class="tooltip"><p>YES if the mapping is a motion <a href="#//api/name/action">action</a>.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/isLineMode">&ndash;&nbsp;isLineMode</a></code>
+		<span class="tooltip"><p>YES if the mapping is an editor <a href="#//api/name/action">action</a> that works on whole lines.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/needsArgument">&ndash;&nbsp;needsArgument</a></code>
+		<span class="tooltip"><p>YES if the mapping is an editor <a href="#//api/name/action">action</a> that needs a character argument, like the vi <code>f</code> command.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-methods">
+						<a title="Properties" name="properties"></a>
+						<h2 class="subtitle subtitle-methods">Properties</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/action" title="action"></a>
+	<h3 class="subsubtitle method-title">action</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The editor <a href="#//api/name/action">action</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) SEL action</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/expression" title="expression"></a>
+	<h3 class="subsubtitle method-title">expression</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>A Nu <a href="#//api/name/expression">expression</a> <a href="#//api/name/macro">macro</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) NuBlock *expression</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/keySequence" title="keySequence"></a>
+	<h3 class="subsubtitle method-title">keySequence</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>An array of NSNumbers that make up the key sequence.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) NSArray *keySequence</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/keyString" title="keyString"></a>
+	<h3 class="subsubtitle method-title">keyString</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>A string describing the key sequence.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) NSString *keyString</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/macro" title="macro"></a>
+	<h3 class="subsubtitle method-title">macro</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>A key string describing the keys that make up the <a href="#//api/name/macro">macro</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) NSString *macro</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/parameter" title="parameter"></a>
+	<h3 class="subsubtitle method-title">parameter</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Any <a href="#//api/name/parameter">parameter</a> that should be passed to the command.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) id parameter</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/recursive" title="recursive"></a>
+	<h3 class="subsubtitle method-title">recursive</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if this <a href="#//api/name/macro">macro</a> should be evaluated recursively.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) BOOL recursive</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/scopeSelector" title="scopeSelector"></a>
+	<h3 class="subsubtitle method-title">scopeSelector</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The scope this mapping applies to.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readonly) NSString *scopeSelector</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+
+					
+
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/isAction" title="isAction"></a>
+	<h3 class="subsubtitle method-title">isAction</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if the mapping is an editor <a href="#//api/name/action">action</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)isAction</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/isExpression" title="isExpression"></a>
+	<h3 class="subsubtitle method-title">isExpression</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if the mapping is a Nu <a href="#//api/name/expression">expression</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)isExpression</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/isLineMode" title="isLineMode"></a>
+	<h3 class="subsubtitle method-title">isLineMode</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if the mapping is an editor <a href="#//api/name/action">action</a> that works on whole lines.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)isLineMode</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/isMacro" title="isMacro"></a>
+	<h3 class="subsubtitle method-title">isMacro</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if the mapping is a <a href="#//api/name/macro">macro</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)isMacro</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/isMotion" title="isMotion"></a>
+	<h3 class="subsubtitle method-title">isMotion</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if the mapping is a motion <a href="#//api/name/action">action</a>.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)isMotion</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/isOperator" title="isOperator"></a>
+	<h3 class="subsubtitle method-title">isOperator</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if the mapping is an operator <a href="#//api/name/action">action</a> that requires a motion component.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)isOperator</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/needsArgument" title="needsArgument"></a>
+	<h3 class="subsubtitle method-title">needsArgument</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>YES if the mapping is an editor <a href="#//api/name/action">action</a> that needs a character argument, like the vi <code>f</code> command.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)needsArgument</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2011 Martin Hedenfalk. All rights reserved. (Last updated: 2011-08-23)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.0.4 (build 703)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+
+					window.name = "";
+				}
+				return false;
+			}
+
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+
+				var tocList = document.getElementById('toc');
+
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+
+			window.onload = init;
+		</script>
+	</body>
+</html>

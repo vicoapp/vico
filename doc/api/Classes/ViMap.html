@@ -1,0 +1,2176 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>ViMap Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.0.4 (build 703)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">Vico API </a></h1>
+				
+			</div>
+
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">ViMap Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+	<option value="properties">Properties</option>
+	
+	<option value="//api/name/acceptsCounts">&nbsp;&nbsp;&nbsp;&nbsp;acceptsCounts</option>
+	
+	<option value="//api/name/defaultAction">&nbsp;&nbsp;&nbsp;&nbsp;defaultAction</option>
+	
+	<option value="//api/name/operatorMap">&nbsp;&nbsp;&nbsp;&nbsp;operatorMap</option>
+	
+	
+
+	
+	<option value="class_methods">Class Methods</option>
+	
+	<option value="//api/name/completionMap">&nbsp;&nbsp;&nbsp;&nbsp;+ completionMap</option>
+	
+	<option value="//api/name/explorerMap">&nbsp;&nbsp;&nbsp;&nbsp;+ explorerMap</option>
+	
+	<option value="//api/name/insertMap">&nbsp;&nbsp;&nbsp;&nbsp;+ insertMap</option>
+	
+	<option value="//api/name/mapWithName:">&nbsp;&nbsp;&nbsp;&nbsp;+ mapWithName:</option>
+	
+	<option value="//api/name/normalMap">&nbsp;&nbsp;&nbsp;&nbsp;+ normalMap</option>
+	
+	<option value="//api/name/operatorMap">&nbsp;&nbsp;&nbsp;&nbsp;+ operatorMap</option>
+	
+	<option value="//api/name/symbolMap">&nbsp;&nbsp;&nbsp;&nbsp;+ symbolMap</option>
+	
+	<option value="//api/name/visualMap">&nbsp;&nbsp;&nbsp;&nbsp;+ visualMap</option>
+	
+	
+
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/include:">&nbsp;&nbsp;&nbsp;&nbsp;- include:</option>
+	
+	<option value="//api/name/includesMap:">&nbsp;&nbsp;&nbsp;&nbsp;- includesMap:</option>
+	
+	<option value="//api/name/map:to:">&nbsp;&nbsp;&nbsp;&nbsp;- map:to:</option>
+	
+	<option value="//api/name/map:to:recursively:scope:">&nbsp;&nbsp;&nbsp;&nbsp;- map:to:recursively:scope:</option>
+	
+	<option value="//api/name/map:to:scope:">&nbsp;&nbsp;&nbsp;&nbsp;- map:to:scope:</option>
+	
+	<option value="//api/name/map:toExpression:">&nbsp;&nbsp;&nbsp;&nbsp;- map:toExpression:</option>
+	
+	<option value="//api/name/map:toExpression:scope:">&nbsp;&nbsp;&nbsp;&nbsp;- map:toExpression:scope:</option>
+	
+	<option value="//api/name/setKey:toAction:">&nbsp;&nbsp;&nbsp;&nbsp;- setKey:toAction:</option>
+	
+	<option value="//api/name/setKey:toAction:flags:parameter:scope:">&nbsp;&nbsp;&nbsp;&nbsp;- setKey:toAction:flags:parameter:scope:</option>
+	
+	<option value="//api/name/setKey:toEditAction:">&nbsp;&nbsp;&nbsp;&nbsp;- setKey:toEditAction:</option>
+	
+	<option value="//api/name/setKey:toEditAction:flags:parameter:scope:">&nbsp;&nbsp;&nbsp;&nbsp;- setKey:toEditAction:flags:parameter:scope:</option>
+	
+	<option value="//api/name/setKey:toMotion:">&nbsp;&nbsp;&nbsp;&nbsp;- setKey:toMotion:</option>
+	
+	<option value="//api/name/setKey:toMotion:flags:parameter:scope:">&nbsp;&nbsp;&nbsp;&nbsp;- setKey:toMotion:flags:parameter:scope:</option>
+	
+	<option value="//api/name/setKey:toOperator:">&nbsp;&nbsp;&nbsp;&nbsp;- setKey:toOperator:</option>
+	
+	<option value="//api/name/setKey:toOperator:flags:parameter:scope:">&nbsp;&nbsp;&nbsp;&nbsp;- setKey:toOperator:flags:parameter:scope:</option>
+	
+	<option value="//api/name/unmap:">&nbsp;&nbsp;&nbsp;&nbsp;- unmap:</option>
+	
+	<option value="//api/name/unmap:scope:">&nbsp;&nbsp;&nbsp;&nbsp;- unmap:scope:</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Creating custom maps">Creating custom maps</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Predefined standard maps">Predefined standard maps</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Including other maps">Including other maps</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Mapping macros">Mapping macros</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Mapping Nu expressions">Mapping Nu expressions</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Mapping keys to actions">Mapping keys to actions</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Unmapping keys">Unmapping keys</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#properties">Properties</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/acceptsCounts">acceptsCounts</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/defaultAction">defaultAction</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/operatorMap">operatorMap</a></span></li>
+	
+</ul></li>
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#class_methods">Class Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/completionMap">completionMap</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/explorerMap">explorerMap</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/insertMap">insertMap</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/mapWithName:">mapWithName:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/normalMap">normalMap</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/operatorMap">operatorMap</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/symbolMap">symbolMap</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/visualMap">visualMap</a></span></li>
+	
+</ul></li>
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/include:">include:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/includesMap:">includesMap:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/map:to:">map:to:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/map:to:recursively:scope:">map:to:recursively:scope:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/map:to:scope:">map:to:scope:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/map:toExpression:">map:toExpression:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/map:toExpression:scope:">map:toExpression:scope:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setKey:toAction:">setKey:toAction:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setKey:toAction:flags:parameter:scope:">setKey:toAction:flags:parameter:scope:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setKey:toEditAction:">setKey:toEditAction:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setKey:toEditAction:flags:parameter:scope:">setKey:toEditAction:flags:parameter:scope:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setKey:toMotion:">setKey:toMotion:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setKey:toMotion:flags:parameter:scope:">setKey:toMotion:flags:parameter:scope:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setKey:toOperator:">setKey:toOperator:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/setKey:toOperator:flags:parameter:scope:">setKey:toOperator:flags:parameter:scope:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/unmap:">unmap:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/unmap:scope:">unmap:scope:</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="ViMap Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">ViMap Class Reference</h1>
+					</div>
+				</div>
+				<div id="container">
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSObject</td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">ViMap.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>A map contains keys (or key sequences) mapped to editor actions, macros or Nu expressions.</p>
+
+<p>A key sequence is a string of one or more keys. A key can be a
+regular character like &lsquo;a&rsquo; or &lsquo;€&rsquo;. Key characters are case sensitive,
+so &lsquo;a&rsquo; is different from &lsquo;A&rsquo;.</p>
+
+<p>Special keys are specified as a string within angle brackets,
+like <code>&lt;f4&gt;</code>, <code>&lt;down&gt;</code> or <code>&lt;enter&gt;</code>. Modifiers are prepended with
+a separating dash, like <code>&lt;control-f4&gt;</code>, <code>&lt;command-down&gt;</code> or
+<code>&lt;alt-enter&gt;</code>. Multiple modifiers are also possible: <code>&lt;alt-command-tab&gt;</code>.
+The order of modifiers is not significant.</p>
+
+<p>The following modifiers are recognized:</p>
+
+<ul>
+<li><code>control</code>, <code>ctrl</code> or <code>c</code> &mdash; Control modifier</li>
+<li><code>option</code>, <code>alt</code>, <code>meta</code>, <code>a</code> or <code>m</code> &mdash; Option modifier</li>
+<li><code>command</code>, <code>cmd</code> or <code>d</code> &mdash; Command modifier</li>
+<li><code>shift</code> or <code>s</code> &mdash; Shift modifier</li>
+</ul>
+
+
+<p>For single character keys, the <code>shift</code> modifier should not be
+used. Use the corresponding upper case character instead. The same
+applies to the <code>option</code> modifier; if the generated character is a
+valid unicode character, use that character and drop the <code>option</code>
+modifier.</p>
+
+<p>The following special keys are recognized:</p>
+
+<ul>
+<li><code>delete</code> or <code>del</code> &mdash; Delete function key</li>
+<li><code>left</code> &mdash; Left arrow key</li>
+<li><code>right</code> &mdash; Right arrow key</li>
+<li><code>up</code> &mdash; Up arrow key</li>
+<li><code>down</code> &mdash; Down arrow key</li>
+<li><code>pageup</code> or <code>pgup</code> &mdash; Page Up function key</li>
+<li><code>pagedown</code> or <code>pgdn</code> &mdash; Page Down function key</li>
+<li><code>home</code> &mdash; Home function key</li>
+<li><code>end</code> &mdash; End function key</li>
+<li><code>insert</code> or <code>ins</code> &mdash; Insert function key</li>
+<li><code>help</code> &mdash; Help function key</li>
+<li><code>backspace</code> or <code>bs</code> &mdash; Backspace key</li>
+<li><code>tab</code> &mdash; Tab key</li>
+<li><code>escape</code> or <code>esc</code> &mdash; Escape key</li>
+<li><code>cr</code>, <code>enter</code> or <code>return</code> &mdash; Enter key</li>
+<li><code>bar</code> &mdash; <code>|</code> key</li>
+<li><code>lt</code> &mdash; <code>&lt;</code> key</li>
+<li><code>backslash</code> or <code>bslash</code> &mdash; <code>\</code> key</li>
+<li><code>nl</code> &mdash; Same as <code>&lt;control-j&gt;</code></li>
+<li><code>ff</code> &mdash; Same as <code>&lt;control-l&gt;</code></li>
+<li><code>nul</code> &mdash; Null key</li>
+</ul>
+
+
+<p>Mappings that are limited by a scope selector will only be recognized if
+the current scope matches the selector. If multiple mappings match the
+current scope, the scope selector with the highest rank is used. Mappings
+with an empty scope selector has the lowest possible rank.</p>
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+
+						
+						<h3 class="subsubtitle task-title">Other Methods</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/operatorMap">&nbsp;&nbsp;operatorMap</a></code>
+		<span class="tooltip"><p>Assign a map to be used by operator actions.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/acceptsCounts">&nbsp;&nbsp;acceptsCounts</a></code>
+		<span class="tooltip"><p>If YES, leading digits acts as count to commands.
+If NO, digits are treated as normal commands.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/defaultAction">&nbsp;&nbsp;defaultAction</a></code>
+		<span class="tooltip"><p>If no mapping matches a key sequence, this action is called.</p></span>
+	</span>
+	<span class="task-item-suffix">property</span>
+	
+</li>
+						</ul>
+						
+
+						<a title="Creating custom maps" name="task_Creating custom maps"></a>
+						<h3 class="subsubtitle task-title">Creating custom maps</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/mapWithName:">+&nbsp;mapWithName:</a></code>
+		<span class="tooltip"><p>Create a new empty map.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Predefined standard maps" name="task_Predefined standard maps"></a>
+						<h3 class="subsubtitle task-title">Predefined standard maps</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/insertMap">+&nbsp;insertMap</a></code>
+		<span class="tooltip"><p>The map used in insert mode.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/normalMap">+&nbsp;normalMap</a></code>
+		<span class="tooltip"><p>The map used in normal mode.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/operatorMap">+&nbsp;operatorMap</a></code>
+		<span class="tooltip"><p>The map used after an operator command.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/visualMap">+&nbsp;visualMap</a></code>
+		<span class="tooltip"><p>The map used in visual mode.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/explorerMap">+&nbsp;explorerMap</a></code>
+		<span class="tooltip"><p>The map used in the file explorer sidebar.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/symbolMap">+&nbsp;symbolMap</a></code>
+		<span class="tooltip"><p>The map used in the symbol list sidebar.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/completionMap">+&nbsp;completionMap</a></code>
+		<span class="tooltip"><p>The map used in completion popups.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Including other maps" name="task_Including other maps"></a>
+						<h3 class="subsubtitle task-title">Including other maps</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/includesMap:">&ndash;&nbsp;includesMap:</a></code>
+		<span class="tooltip"><p>Check if a map is included by another map.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/include:">&ndash;&nbsp;include:</a></code>
+		<span class="tooltip"><p>Add a reference to another map.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Mapping macros" name="task_Mapping macros"></a>
+						<h3 class="subsubtitle task-title">Mapping macros</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/map:to:recursively:scope:">&ndash;&nbsp;map:to:recursively:scope:</a></code>
+		<span class="tooltip"><p>Map a key sequence to a macro.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/map:to:scope:">&ndash;&nbsp;map:to:scope:</a></code>
+		<span class="tooltip"><p>Map a key sequence to a macro non-recursively.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/map:to:">&ndash;&nbsp;map:to:</a></code>
+		<span class="tooltip"><p>Globally map a key sequence to a macro non-recursively.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Mapping Nu expressions" name="task_Mapping Nu expressions"></a>
+						<h3 class="subsubtitle task-title">Mapping Nu expressions</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/map:toExpression:scope:">&ndash;&nbsp;map:toExpression:scope:</a></code>
+		<span class="tooltip"><p>Map a key sequence to a Nu expression.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/map:toExpression:">&ndash;&nbsp;map:toExpression:</a></code>
+		<span class="tooltip"><p>Map a key sequence to a Nu expression.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Mapping keys to actions" name="task_Mapping keys to actions"></a>
+						<h3 class="subsubtitle task-title">Mapping keys to actions</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setKey:toAction:flags:parameter:scope:">&ndash;&nbsp;setKey:toAction:flags:parameter:scope:</a></code>
+		<span class="tooltip"><p>Map a key sequence to an action.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setKey:toAction:">&ndash;&nbsp;setKey:toAction:</a></code>
+		<span class="tooltip"><p>Map a key sequence to an action.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setKey:toMotion:flags:parameter:scope:">&ndash;&nbsp;setKey:toMotion:flags:parameter:scope:</a></code>
+		<span class="tooltip"><p>Map a key sequence to a motion action.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setKey:toMotion:">&ndash;&nbsp;setKey:toMotion:</a></code>
+		<span class="tooltip"><p>Map a key sequence to a motion action.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setKey:toEditAction:flags:parameter:scope:">&ndash;&nbsp;setKey:toEditAction:flags:parameter:scope:</a></code>
+		<span class="tooltip"><p>Map a key sequence to an edit action.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setKey:toEditAction:">&ndash;&nbsp;setKey:toEditAction:</a></code>
+		<span class="tooltip"><p>Map a key sequence to an edit action.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setKey:toOperator:flags:parameter:scope:">&ndash;&nbsp;setKey:toOperator:flags:parameter:scope:</a></code>
+		<span class="tooltip"><p>Map a key sequence to an operator action.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/setKey:toOperator:">&ndash;&nbsp;setKey:toOperator:</a></code>
+		<span class="tooltip"><p>Map a key sequence to an operator action.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+
+						<a title="Unmapping keys" name="task_Unmapping keys"></a>
+						<h3 class="subsubtitle task-title">Unmapping keys</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/unmap:scope:">&ndash;&nbsp;unmap:scope:</a></code>
+		<span class="tooltip"><p>Unmap a key sequence in a specific scope.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/unmap:">&ndash;&nbsp;unmap:</a></code>
+		<span class="tooltip"><p>Unmap a key sequence without a limiting scope.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-methods">
+						<a title="Properties" name="properties"></a>
+						<h2 class="subtitle subtitle-methods">Properties</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/acceptsCounts" title="acceptsCounts"></a>
+	<h3 class="subsubtitle method-title">acceptsCounts</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>If YES, leading digits acts as count to commands.
+If NO, digits are treated as normal commands.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) BOOL acceptsCounts</code></div>
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p><a href="#//api/name/acceptsCounts"><code>acceptsCounts</code></a> should be disabled for maps in insert mode.
+Default is YES.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/defaultAction" title="defaultAction"></a>
+	<h3 class="subsubtitle method-title">defaultAction</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>If no mapping matches a key sequence, this action is called.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite) SEL defaultAction</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/operatorMap" title="operatorMap"></a>
+	<h3 class="subsubtitle method-title">operatorMap</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Assign a map to be used by operator actions.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>@property (nonatomic, readwrite, assign) ViMap *operatorMap</code></div>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+
+					
+					<div class="section section-methods">
+						<a title="Class Methods" name="class_methods"></a>
+						<h2 class="subtitle subtitle-methods">Class Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/completionMap" title="completionMap"></a>
+	<h3 class="subsubtitle method-title">completionMap</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The map used in completion popups.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViMap *)completionMap</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The map used in completion popups.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/explorerMap" title="explorerMap"></a>
+	<h3 class="subsubtitle method-title">explorerMap</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The map used in the file explorer sidebar.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViMap *)explorerMap</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The map used in the file explorer sidebar.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/insertMap" title="insertMap"></a>
+	<h3 class="subsubtitle method-title">insertMap</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The map used in insert mode.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViMap *)insertMap</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The map used in insert mode.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/mapWithName:" title="mapWithName:"></a>
+	<h3 class="subsubtitle method-title">mapWithName:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Create a new empty map.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViMap *)mapWithName:(NSString *)<em>mapName</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>mapName</em></dt>
+			<dd><p>The name of the map.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The newly created map. It is initially empty.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/normalMap" title="normalMap"></a>
+	<h3 class="subsubtitle method-title">normalMap</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The map used in normal mode.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViMap *)normalMap</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The map used in normal mode.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/operatorMap" title="operatorMap"></a>
+	<h3 class="subsubtitle method-title">operatorMap</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The map used after an operator command.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViMap *)operatorMap</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The map used after an operator command.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/symbolMap" title="symbolMap"></a>
+	<h3 class="subsubtitle method-title">symbolMap</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The map used in the symbol list sidebar.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViMap *)symbolMap</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The map used in the symbol list sidebar.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/visualMap" title="visualMap"></a>
+	<h3 class="subsubtitle method-title">visualMap</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The map used in visual mode.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>+ (ViMap *)visualMap</code></div>
+
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The map used in visual mode.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/include:" title="include:"></a>
+	<h3 class="subsubtitle method-title">include:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Add a reference to another map.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)include:(ViMap *)<em>map</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>map</em></dt>
+			<dd><p>The other map to include in this map.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Mappings in an included map can be overridden by mappings in the parent map.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/includesMap:" title="includesMap:"></a>
+	<h3 class="subsubtitle method-title">includesMap:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Check if a map is included by another map.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)includesMap:(ViMap *)<em>aMap</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>aMap</em></dt>
+			<dd><p>The map to check for inclusion.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the given map is included by this map.</p>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/map:to:" title="map:to:"></a>
+	<h3 class="subsubtitle method-title">map:to:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Globally map a key sequence to a macro non-recursively.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)map:(NSString *)<em>keySequence</em> to:(NSString *)<em>macro</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keySequence</em></dt>
+			<dd><p>The key sequence to map.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>macro</em></dt>
+			<dd><p>The key sequence that make up the macro.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/map:to:scope:">&ndash; map:to:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/map:to:recursively:scope:" title="map:to:recursively:scope:"></a>
+	<h3 class="subsubtitle method-title">map:to:recursively:scope:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to a macro.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)map:(NSString *)<em>keySequence</em> to:(NSString *)<em>macro</em> recursively:(BOOL)<em>recursiveFlag</em> scope:(NSString *)<em>scopeSelector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keySequence</em></dt>
+			<dd><p>The key sequence to map. Can include special keys within angle brackets, like <code>&lt;cmd-ctrl-up&gt;</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>macro</em></dt>
+			<dd><p>The key sequence that make up the macro.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>recursiveFlag</em></dt>
+			<dd><p>YES if the macro should be evaluated recursively.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>A scope selector limiting where this key sequence is applicable, or nil for no limit.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/map:to:scope:" title="map:to:scope:"></a>
+	<h3 class="subsubtitle method-title">map:to:scope:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to a macro non-recursively.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)map:(NSString *)<em>keySequence</em> to:(NSString *)<em>macro</em> scope:(NSString *)<em>scopeSelector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keySequence</em></dt>
+			<dd><p>The key sequence to map.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>macro</em></dt>
+			<dd><p>The key sequence that make up the macro.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>A scope selector limiting where this key sequence is applicable, or nil for no limit.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/map:to:recursively:scope:">&ndash; map:to:recursively:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/map:toExpression:" title="map:toExpression:"></a>
+	<h3 class="subsubtitle method-title">map:toExpression:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to a Nu expression.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)map:(NSString *)<em>keySequence</em> toExpression:(id)<em>expr</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keySequence</em></dt>
+			<dd><p>The key sequence to map.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>expr</em></dt>
+			<dd><p>A Nu anonymous function (<code>do</code> block) with zero arguments. See the <a href="http://programming.nu/operators#functions">Nu documentation</a>.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>The mapping will be created with global scope, ie no limiting scope selector.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/map:toExpression:scope:">&ndash; map:toExpression:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/map:toExpression:scope:" title="map:toExpression:scope:"></a>
+	<h3 class="subsubtitle method-title">map:toExpression:scope:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to a Nu expression.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)map:(NSString *)<em>keySequence</em> toExpression:(id)<em>expr</em> scope:(NSString *)<em>scopeSelector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keySequence</em></dt>
+			<dd><p>The key sequence to map. Can include special keys within angle brackets, like <code>&lt;cmd-ctrl-up&gt;</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>expr</em></dt>
+			<dd><p>A Nu anonymous function (<code>do</code> block) with zero arguments. See the <a href="http://programming.nu/operators#functions">Nu documentation</a>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>A scope selector limiting where this key sequence is applicable, or nil for no limit.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setKey:toAction:" title="setKey:toAction:"></a>
+	<h3 class="subsubtitle method-title">setKey:toAction:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to an action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setKey:(NSString *)<em>keyDescription</em> toAction:(SEL)<em>selector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keyDescription</em></dt>
+			<dd><p>The key sequence to map.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>selector</em></dt>
+			<dd><p>The selector of the action.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>This sets flags to 0, parameter to nil and empty scope selector.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/setKey:toAction:flags:parameter:scope:">&ndash; setKey:toAction:flags:parameter:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setKey:toAction:flags:parameter:scope:" title="setKey:toAction:flags:parameter:scope:"></a>
+	<h3 class="subsubtitle method-title">setKey:toAction:flags:parameter:scope:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to an action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setKey:(NSString *)<em>keyDescription</em> toAction:(SEL)<em>selector</em> flags:(NSUInteger)<em>flags</em> parameter:(id)<em>param</em> scope:(NSString *)<em>scopeSelector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keyDescription</em></dt>
+			<dd><p>The key sequence to map. Can include special keys within angle brackets, like <code>&lt;cmd-ctrl-up&gt;</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>selector</em></dt>
+			<dd><p>The selector of the action.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>flags</em></dt>
+			<dd><p>A combination of flags, or&rsquo;d together.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>param</em></dt>
+			<dd><p>Any parameter that should be passed to the command.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>A scope selector limiting where this key sequence is applicable, or nil for no limit.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setKey:toEditAction:" title="setKey:toEditAction:"></a>
+	<h3 class="subsubtitle method-title">setKey:toEditAction:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to an edit action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setKey:(NSString *)<em>keyDescription</em> toEditAction:(SEL)<em>selector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keyDescription</em></dt>
+			<dd><p>The key sequence to map.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>selector</em></dt>
+			<dd><p>The selector of the action.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>This sets flags to <code>ViMapSetsDot</code>, parameter to <code>nil</code> and an empty scope selector.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/setKey:toEditAction:flags:parameter:scope:">&ndash; setKey:toEditAction:flags:parameter:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setKey:toEditAction:flags:parameter:scope:" title="setKey:toEditAction:flags:parameter:scope:"></a>
+	<h3 class="subsubtitle method-title">setKey:toEditAction:flags:parameter:scope:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to an edit action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setKey:(NSString *)<em>keyDescription</em> toEditAction:(SEL)<em>selector</em> flags:(NSUInteger)<em>flags</em> parameter:(id)<em>param</em> scope:(NSString *)<em>scopeSelector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keyDescription</em></dt>
+			<dd><p>The key sequence to map. Can include special keys within angle brackets, like <code>&lt;cmd-ctrl-up&gt;</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>selector</em></dt>
+			<dd><p>The selector of the action.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>flags</em></dt>
+			<dd><p>A combination of flags, or&rsquo;d together. The <code>ViMapSetsDot</code> flag is always set.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>param</em></dt>
+			<dd><p>Any parameter that should be passed to the command.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>A scope selector limiting where this key sequence is applicable, or nil for no limit.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/setKey:toAction:flags:parameter:scope:">&ndash; setKey:toAction:flags:parameter:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setKey:toMotion:" title="setKey:toMotion:"></a>
+	<h3 class="subsubtitle method-title">setKey:toMotion:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to a motion action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setKey:(NSString *)<em>keyDescription</em> toMotion:(SEL)<em>selector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keyDescription</em></dt>
+			<dd><p>The key sequence to map.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>selector</em></dt>
+			<dd><p>The selector of the action.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>This sets flags to <code>ViMapIsMotion</code>, parameter to <code>nil</code> and an empty scope selector.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/setKey:toMotion:flags:parameter:scope:">&ndash; setKey:toMotion:flags:parameter:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setKey:toMotion:flags:parameter:scope:" title="setKey:toMotion:flags:parameter:scope:"></a>
+	<h3 class="subsubtitle method-title">setKey:toMotion:flags:parameter:scope:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to a motion action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setKey:(NSString *)<em>keyDescription</em> toMotion:(SEL)<em>selector</em> flags:(NSUInteger)<em>flags</em> parameter:(id)<em>param</em> scope:(NSString *)<em>scopeSelector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keyDescription</em></dt>
+			<dd><p>The key sequence to map. Can include special keys within angle brackets, like <code>&lt;cmd-ctrl-up&gt;</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>selector</em></dt>
+			<dd><p>The selector of the action.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>flags</em></dt>
+			<dd><p>A combination of flags, or&rsquo;d together. The <code>ViMapIsMotion</code> flag is always set.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>param</em></dt>
+			<dd><p>Any parameter that should be passed to the command.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>A scope selector limiting where this key sequence is applicable, or nil for no limit.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/setKey:toAction:flags:parameter:scope:">&ndash; setKey:toAction:flags:parameter:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setKey:toOperator:" title="setKey:toOperator:"></a>
+	<h3 class="subsubtitle method-title">setKey:toOperator:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to an operator action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setKey:(NSString *)<em>keyDescription</em> toOperator:(SEL)<em>selector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keyDescription</em></dt>
+			<dd><p>The key sequence to map.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>selector</em></dt>
+			<dd><p>The selector of the action.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>This sets flags to <code>ViMapNeedMotion</code>, parameter to <code>nil</code> and an empty scope selector.</p>
+	</div>
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/setKey:toOperator:flags:parameter:scope:">&ndash; setKey:toOperator:flags:parameter:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/setKey:toOperator:flags:parameter:scope:" title="setKey:toOperator:flags:parameter:scope:"></a>
+	<h3 class="subsubtitle method-title">setKey:toOperator:flags:parameter:scope:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Map a key sequence to an operator action.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)setKey:(NSString *)<em>keyDescription</em> toOperator:(SEL)<em>selector</em> flags:(NSUInteger)<em>flags</em> parameter:(id)<em>param</em> scope:(NSString *)<em>scopeSelector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keyDescription</em></dt>
+			<dd><p>The key sequence to map. Can include special keys within angle brackets, like <code>&lt;cmd-ctrl-up&gt;</code>.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>selector</em></dt>
+			<dd><p>The selector of the action.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>flags</em></dt>
+			<dd><p>A combination of flags, or&rsquo;d together. The <code>ViMapNeedMotion</code> flag is always set.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>param</em></dt>
+			<dd><p>Any parameter that should be passed to the command.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>A scope selector limiting where this key sequence is applicable, or nil for no limit.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/setKey:toAction:flags:parameter:scope:">&ndash; setKey:toAction:flags:parameter:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/unmap:" title="unmap:"></a>
+	<h3 class="subsubtitle method-title">unmap:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Unmap a key sequence without a limiting scope.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)unmap:(NSString *)<em>keySequence</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keySequence</em></dt>
+			<dd><p>The key sequence to unmap.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection see-also-section">
+		<h4 class="method-subtitle">See Also</h4>
+		<ul>
+			
+			<li><code><p><a href="#//api/name/unmap:scope:">&ndash; unmap:scope:</a></p></code></li>
+			
+		</ul>
+	</div>
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/unmap:scope:" title="unmap:scope:"></a>
+	<h3 class="subsubtitle method-title">unmap:scope:</h3>
+
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Unmap a key sequence in a specific scope.</p>
+	</div>
+	
+
+	<div class="method-subsection method-declaration"><code>- (void)unmap:(NSString *)<em>keySequence</em> scope:(NSString *)<em>scopeSelector</em></code></div>
+
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>keySequence</em></dt>
+			<dd><p>The key sequence to unmap.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>scopeSelector</em></dt>
+			<dd><p>A scope selector matching a previously mapped key sequence.</p></dd>
+		</dl>
+		
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">ViMap.h</code><br />
+	</div>
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2011 Martin Hedenfalk. All rights reserved. (Last updated: 2011-08-23)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.0.4 (build 703)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+
+					window.name = "";
+				}
+				return false;
+			}
+
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+
+				var tocList = document.getElementById('toc');
+
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+
+			window.onload = init;
+		</script>
+	</body>
+</html>

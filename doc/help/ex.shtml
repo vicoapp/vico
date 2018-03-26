@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>The ex command line</title>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>The ex command line</h1>
+
+<p>The ex command line is normally hidden under the status bar at the
+bottom of the window. The command line is used to enter ex commands
+(<kbd>:</kbd>), filter commands (<kbd>!</kbd>) and search patterns
+(<kbd>/</kbd> and <kbd>?</kbd>).</p>
+
+<p>Lines entered on the command line are remembered in a history. Use up and
+down arrows to recall history.</p>
+
+<ul>
+<li><a href="ex_ranges.shtml">Ex ranges</a></li>
+<li><a href="ex_cmds.shtml">Ex commands</a></li>
+</ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

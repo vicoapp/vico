@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Searching</title>
+  
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Searching</h1>
+
+<p>To search, use the <kbd>/</kbd> command and enter a regular expression
+in the command line at the bottom of the window. This command is also
+available by the standard <kbd>&#x2318;F</kbd> key.</p>
+
+<p>If the <kbd>ignorecase</kbd> option is set, case is ignored. If the
+<kbd>smartcase</kbd> option is also set, case is ignored only if the
+search pattern does not include any uppercase characters.</p>
+
+<p>To search backwards, use <kbd>?</kbd>.</p>
+
+<p>To quickly search for the word under the caret, use <kbd>*</kbd>. The
+<kbd>#</kbd> command searches backwards instead.</p>
+
+<p>You can repeat the last seach command in the same direction with the
+<kbd>n</kbd> command. The upper case <kbd>N</kbd> command reverses the
+direction.</p>
+
+<ul>
+<li><a href="movement.shtml">Movement</a></li>
+</ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

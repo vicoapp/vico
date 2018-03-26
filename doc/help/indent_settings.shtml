@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Settings for indentation</title>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Settings for indentation</h1>
+
+<p>The <kbd>shiftwidth</kbd> setting controls how large an indentation is in terms
+of spaces. This is different from the <kbd>tabstop</kbd> setting that specifies
+how large an actual tab character is.</p>
+
+<p>If <kbd>shiftwidth</kbd> is set to 4 and <kbd>tabstop</kbd> is left at the
+default 8, one indentation will use 4 spaces, but two indentations will use one
+tab.</p>
+
+<p>Use the <kbd>expandtab</kbd> setting to always use spaces when indenting.</p>
+
+<p>When the <kbd>autoindent</kbd> setting is enabled, a new line will use the same
+amount of indentation as the previous line. The <kbd>smartindent</kbd> setting
+adds syntax-aware rules for increasing and decreasing the automatic indentation.</p>
+
+<ul>
+<li><a href="change_indent.shtml">Changing indentation</a></li>
+</ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

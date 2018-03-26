@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Operator commands</title>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="../index.html"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="../index.html">home</a>
+        <a href="../download.html">download</a>
+        
+        <a href="index.html">help</a>
+        <a href="../api/index.html">api</a>
+      </p>
+    </header>
+    <div id="main">
+
+<h1>Operator commands</h1>
+
+<p>Some commands must be combined with a motion command to be complete. These
+commands are called operators, as they operate on the text affected by the
+motion command.</p>
+
+<p>The standard operator commands are:</p>
+
+<ul>
+<li><kbd>d</kbd> -- delete</li>
+<li><kbd>c</kbd> -- change</li>
+<li><kbd>y</kbd> -- yank, or copy</li>
+<li><kbd>=</kbd> -- indent</li>
+<li><kbd>&lt;</kbd> -- shift left</li>
+<li><kbd>&gt;</kbd> -- shift right</li>
+<li><kbd>!</kbd> -- filter through external command</li>
+<li><kbd>gu</kbd> -- lowercase</li>
+<li><kbd>gU</kbd> -- uppercase</li>
+<li><kbd>gq</kbd> -- format text</li>
+</ul>
+
+<p>You combine the operator with a motion just by entering the motion command
+after the operator. For example, <kbd>cw</kbd> <strong>c</strong>hanges a <strong>w</strong>ord.</p>
+
+<p>All operator commands can be doubled to imply the current line. This way,
+<kbd>dd</kbd> deletes the current line, <kbd>&gt;&gt;</kbd> shift the current
+line one <a href="indent_settings.html">shiftwidth</a> to the right and <kbd>yy</kbd>
+copies (yanks) the line.</p>
+
+    </div>
+  </div>
+  <footer>
+  </footer>
+</body>
+</html>

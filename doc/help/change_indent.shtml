@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Changing indentation</title>
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Changing indentation</h1>
+
+<p>While in insert mode, use the <kbd>ctrl-t</kbd> and <kbd>ctrl-d</kbd> commands
+to increase and decrease the indentation level of the current line.</p>
+
+<p>To manually shift a block of text left or right, use the <kbd>&lt;</kbd> and
+<kbd>&gt;</kbd> <a href="operators.shtml">operators</a>. It's easy to use them in
+<a href="visual.shtml">visual mode</a> by first selecting the text that should be indented.</p>
+
+<p>The <kbd>=</kbd> command can be used to automatically indent text based on
+the current language syntax.</p>
+
+<p>The above commands uses the indentation settings for the current scope to
+determine how to indent.</p>
+
+<ul>
+<li><a href="indent_settings.shtml">Indentation settings</a></li>
+</ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

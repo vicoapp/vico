@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/vicoapp.css" />
+  <title>Working with remote files</title>
+  
+</head>
+<body>
+
+  <div id="wrapper">
+    <header>
+      <p>
+        <a href="http://www.vicoapp.com/"><img src="../img/vico-logo-250px.png" alt="Vico" /></a>
+        <a href="http://www.vicoapp.com/">home</a>
+        <a href="http://blog.vicoapp.com/">blog</a>
+        <a href="http://www.vicoapp.com/download.shtml">download</a>
+        <a href="http://help.vicoapp.com/">feedback</a>
+        <a href="http://lists.vicoapp.com/">lists</a>
+        <a href="http://vicoapp.com/help/en/">help</a>
+        <a href="http://help.vicoapp.com/api/">api</a>
+      </p>
+      
+      
+    </header>
+    <div id="main">
+
+<h1>Working with remote files</h1>
+
+<p>Vico has built-in support for editing files over SFTP. To open a remote directory,
+use the <kbd>:cd</kbd> command to change to a <kbd>sftp://</kbd> URL. For
+example, <kbd>:cd sftp://www.example.com</kbd> changes to the home directory on
+the <kbd>www.example.com</kbd> server. Use the <a href="explorer.shtml">explorer</a>
+sidebar to open files, or directly with the <kbd>:edit</kbd> command.</p>
+
+<p>A file relative to the home directory on the remote server can be referenced
+by the following URL: <kbd>sftp://www.example.com/~/directory/file.txt</kbd></p>
+
+<p>For SFTP to work, you must use public key authentication. It is recommended
+that you protect your private key with a passphrase.</p>
+
+<p>Vico's SFTP support uses the ssh support built-in to Mac OS X, so any
+configuration files you already have for ssh will be used.</p>
+
+<ul>
+<li><a href="ssh_keygen.shtml">Creating a key for SFTP</a></li>
+<li><a href="ex.shtml">ex command line</a></li>
+<li><a href="http://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man5/ssh_config.5.html">ssh_config(5) manual page</a></li>
+</ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="http://www.twitter.com/vicoapp">
+        <img id="follow" src="http://twitter-badges.s3.amazonaws.com/t_small-a.png"
+        title="Follow vicoapp on Twitter" alt="Follow vicoapp on Twitter"/>
+        Follow vicoapp on Twitter
+      </a>
+    </p>
+    <p>
+      <a href="mailto:support@vicoapp.com">support@vicoapp.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
+

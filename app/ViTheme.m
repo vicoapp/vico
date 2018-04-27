@@ -272,9 +272,30 @@
 	                                   forKey:NSForegroundColorAttributeName];
 }
 
+- (NSColor *)lineNumberForegroundColor
+{
+	if ([self hasDarkBackground]) {
+		return [NSColor colorWithCalibratedWhite:0.75 alpha:1.0];
+	} else {
+		return [NSColor colorWithCalibratedWhite:0.25 alpha:1.0];
+	}
+}
+
+- (NSColor *)lineNumberBackgroundColor
+{
+	NSColor* blend;
+	
+	if ([self hasDarkBackground]) {
+		blend = [NSColor whiteColor];
+	} else {
+		blend = [NSColor blackColor];
+	}
+	return [[self backgroundColor] blendedColorWithFraction:0.04 ofColor:blend];
+}
+
 - (BOOL)hasDarkBackground
 {
-	return ([[self backgroundColor] brightnessComponent] < 0.6);
+	return ([[self backgroundColor] brightnessComponent] < 0.55);
 }
 
 - (NSString *)description

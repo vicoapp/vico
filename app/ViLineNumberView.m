@@ -2,6 +2,7 @@
 
 #import "ViFold.h"
 #import "ViTextView.h"
+#import "ViTheme.h"
 #import "ViThemeStore.h"
 
 #define DEFAULT_THICKNESS	22.0
@@ -33,16 +34,18 @@
 
 @implementation ViLineNumberView
 
-- (ViLineNumberView *)initWithTextView:(ViTextView *)aTextView backgroundColor:(NSColor *)aColor
+- (ViLineNumberView *)initWithTextView:(ViTextView *)aTextView
 {
 	if (self = [super init]) {
-		_backgroundColor = aColor;
 		_relative = NO;
 
 		self.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin;
 
 		[self setTextView:aTextView];
-		[self resetTextAttributes];
+
+		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+		[defaults addObserver:self forKeyPath:@"theme" options:NSKeyValueObservingOptionNew context:NULL];
+		[self setTheme: [ViThemeStore defaultTheme]];
 	}
 	
 	return self;
@@ -141,7 +144,7 @@
 {
 	_textAttributes = @{
 		NSFontAttributeName:			[NSFont labelFontOfSize:0.8 * [[ViThemeStore font] pointSize]],
-		NSForegroundColorAttributeName:	[NSColor colorWithCalibratedWhite:0.42 alpha:1.0]
+		NSForegroundColorAttributeName: _foregroundColor
 	};
 
 	_digitSize = [@"8" sizeWithAttributes:_textAttributes];
@@ -158,6 +161,14 @@
 	}
 
 	[self setNeedsDisplay:YES];
+}
+
+- (void)setTheme:(ViTheme *)theme
+{
+	_foregroundColor = [theme lineNumberForegroundColor];
+	_backgroundColor = [theme lineNumberBackgroundColor];
+	_borderColor = [[theme caretColor] colorWithAlphaComponent:0.3];
+	[self resetTextAttributes];
 }
 
 #pragma mark -
@@ -188,6 +199,17 @@
 - (void)foldsDidUpdate:(NSNotification *)notification
 {
 	[self setNeedsDisplay:YES];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+		      ofObject:(id)object
+			change:(NSDictionary *)change
+		       context:(void *)context
+{
+	if ([keyPath isEqualToString:@"theme"]) {
+		ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]];
+		[self setTheme:theme];
+	}
 }
 
 #pragma mark -
@@ -262,6 +284,12 @@
 	if (layoutManager == nil)
 		return;
 
+	// Draw background and border
+	[_backgroundColor setFill];
+	[NSBezierPath fillRect:aRect];
+	[_borderColor setStroke];
+	[NSBezierPath strokeRect:NSMakeRect(aRect.size.width, 0, 0, bounds.size.height)];
+	
 	// Find the characters that are currently visible
 	glyphRange = [layoutManager glyphRangeForBoundingRect:visibleRect
 										  inTextContainer:container];

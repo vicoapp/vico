@@ -2676,6 +2676,12 @@ replaceCharactersInRange:(NSRange)aRange
 								    forKey:NSBackgroundColorAttributeName]];
 
 	backgroundIsDark = [aTheme hasDarkBackground];
+	if (backgroundIsDark) {
+		[[self enclosingScrollView] setScrollerKnobStyle:NSScrollerKnobStyleLight];
+	} else {
+		[[self enclosingScrollView] setScrollerKnobStyle:NSScrollerKnobStyleDark];
+	}
+	
 	[self setCursorColor];
 }
 

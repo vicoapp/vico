@@ -81,8 +81,7 @@
 		if (_lineNumberView) {
 			[_lineNumberView setTextView:(ViTextView *)aView];
 		} else {
-			_lineNumberView = [[ViLineNumberView alloc] initWithTextView:(ViTextView *)aView
-														 backgroundColor:_backgroundColor];
+			_lineNumberView = [[ViLineNumberView alloc] initWithTextView:(ViTextView *)aView];
 
 			[[NSNotificationCenter defaultCenter] addObserver:self
 													 selector:@selector(subviewFrameDidChange:)

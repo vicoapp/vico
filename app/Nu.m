@@ -10854,7 +10854,7 @@ static void nu_swizzleContainerClasses()
     Class NSCFDictionary = NSClassFromString(@"NSCFDictionary");
     Class NSCFArray = NSClassFromString(@"NSCFArray");
     Class NSCFSet = NSClassFromString(@"NSCFSet");
-    [NSCFDictionary include:[NuClass classWithName:@"NSCFDictionarySwizzles"]];
+//    [NSCFDictionary include:[NuClass classWithName:@"NSCFDictionarySwizzles"]];
     [NSCFArray include:[NuClass classWithName:@"NSCFArraySwizzles"]];
     [NSCFSet include:[NuClass classWithName:@"NSCFSetSwizzles"]];
     [NSCFDictionary exchangeInstanceMethod:@selector(setObject:forKey:) withMethod:@selector(nuSetObject:forKey:)];

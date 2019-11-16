@@ -30,6 +30,284 @@
 		17D8A12817CF0354000C25C6 /* SFBCrashReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12317CF0354000C25C6 /* SFBCrashReporter.m */; };
 		17D8A12917CF0354000C25C6 /* SFBCrashReporterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */; };
 		17D8A12A17CF0354000C25C6 /* SFBSystemInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */; };
+		17DD6D66237FA7D200357A93 /* NSCollection-enumeration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */; };
+		17DD6D67237FA7D200357A93 /* scope_selector.lemon in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30313310C3D0023C5B7 /* scope_selector.lemon */; };
+		17DD6D68237FA7D200357A93 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2A0133109C20023C5B7 /* main.m */; };
+		17DD6D69237FA7D200357A93 /* ExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2DB13310C320023C5B7 /* ExCommand.m */; };
+		17DD6D6A237FA7D200357A93 /* MHTextIconCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E413310C330023C5B7 /* MHTextIconCell.m */; };
+		17DD6D6B237FA7D200357A93 /* NSArray-patterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E613310C330023C5B7 /* NSArray-patterns.m */; };
+		17DD6D6C237FA7D200357A93 /* NSObject+SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E813310C340023C5B7 /* NSObject+SPInvocationGrabbing.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		17DD6D6D237FA7D200357A93 /* NSScanner-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2EA13310C340023C5B7 /* NSScanner-additions.m */; };
+		17DD6D6E237FA7D200357A93 /* NSString-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2EC13310C340023C5B7 /* NSString-additions.m */; };
+		17DD6D6F237FA7D200357A93 /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2EE13310C350023C5B7 /* NSString-scopeSelector.m */; };
+		17DD6D70237FA7D200357A93 /* ViFileExplorer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2F013310C360023C5B7 /* ViFileExplorer.m */; };
+		17DD6D71237FA7D200357A93 /* PSMMetalTabStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2F213310C360023C5B7 /* PSMMetalTabStyle.m */; };
+		17DD6D72237FA7D200357A93 /* PSMOverflowPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2F413310C370023C5B7 /* PSMOverflowPopUpButton.m */; };
+		17DD6D73237FA7D200357A93 /* PSMProgressIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2F613310C370023C5B7 /* PSMProgressIndicator.m */; };
+		17DD6D74237FA7D200357A93 /* PSMRolloverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2F813310C380023C5B7 /* PSMRolloverButton.m */; };
+		17DD6D75237FA7D200357A93 /* PSMTabBarCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2FA13310C390023C5B7 /* PSMTabBarCell.m */; };
+		17DD6D76237FA7D200357A93 /* PSMTabBarControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2FC13310C3A0023C5B7 /* PSMTabBarControl.m */; };
+		17DD6D77237FA7D200357A93 /* PSMTabDragAssistant.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2FE13310C3A0023C5B7 /* PSMTabDragAssistant.m */; };
+		17DD6D78237FA7D200357A93 /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30513310C3E0023C5B7 /* SFTPConnection.m */; };
+		17DD6D79237FA7D200357A93 /* SFTPConnectionPool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30713310C3F0023C5B7 /* SFTPConnectionPool.m */; };
+		17DD6D7A237FA7D200357A93 /* TMFileURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30D13310C430023C5B7 /* TMFileURLProtocol.m */; };
+		17DD6D7B237FA7D200357A93 /* TxmtURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30F13310C440023C5B7 /* TxmtURLProtocol.m */; };
+		17DD6D7C237FA7D200357A93 /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31113310C450023C5B7 /* ViAppController.m */; };
+		17DD6D7D237FA7D200357A93 /* ViBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31513310C470023C5B7 /* ViBundle.m */; };
+		17DD6D7E237FA7D200357A93 /* ViBundleCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31713310C480023C5B7 /* ViBundleCommand.m */; };
+		17DD6D7F237FA7D200357A93 /* ViBundleItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31913310C4A0023C5B7 /* ViBundleItem.m */; };
+		17DD6D80237FA7D200357A93 /* ViBundleSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31B13310C4B0023C5B7 /* ViBundleSnippet.m */; };
+		17DD6D81237FA7D200357A93 /* ViCharsetDetector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31D13310C4C0023C5B7 /* ViCharsetDetector.mm */; };
+		17DD6D82237FA7D200357A93 /* ViParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31F13310C4E0023C5B7 /* ViParser.m */; };
+		17DD6D83237FA7D200357A93 /* ViCommandOutputController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF32113310C4F0023C5B7 /* ViCommandOutputController.m */; };
+		17DD6D84237FA7D200357A93 /* ViDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF32413310C520023C5B7 /* ViDocument.m */; };
+		17DD6D85237FA7D200357A93 /* ViDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF32613310C530023C5B7 /* ViDocumentController.m */; };
+		17DD6D86237FA7D200357A93 /* ViTabController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF32813310C550023C5B7 /* ViTabController.m */; };
+		17DD6D87237FA7D200357A93 /* ViDocumentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF32A13310C570023C5B7 /* ViDocumentView.m */; };
+		17DD6D88237FA7D200357A93 /* ViError.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF32C13310C590023C5B7 /* ViError.m */; };
+		17DD6D89237FA7D200357A93 /* ViJumpList.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF32E13310C5A0023C5B7 /* ViJumpList.m */; };
+		17DD6D8A237FA7D200357A93 /* ViLanguage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33013310C5C0023C5B7 /* ViLanguage.m */; };
+		17DD6D8B237FA7D200357A93 /* ViBundleStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33213310C5F0023C5B7 /* ViBundleStore.m */; };
+		17DD6D8C237FA7D200357A93 /* ViLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33413310C610023C5B7 /* ViLayoutManager.m */; };
+		17DD6D8D237FA7D200357A93 /* ViMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33813310C650023C5B7 /* ViMark.m */; };
+		17DD6D8E237FA7D200357A93 /* ViOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33A13310C670023C5B7 /* ViOutlineView.m */; };
+		17DD6D8F237FA7D200357A93 /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33E13310C6B0023C5B7 /* ViPreferencesController.m */; };
+		17DD6D90237FA7D200357A93 /* ViProject.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34013310C6E0023C5B7 /* ViProject.m */; };
+		17DD6D91237FA7D200357A93 /* ViRegexp.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34213310C700023C5B7 /* ViRegexp.m */; };
+		17DD6D92237FA7D200357A93 /* ViRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34413310C720023C5B7 /* ViRulerView.m */; };
+		17DD6D93237FA7D200357A93 /* ViScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34613310C750023C5B7 /* ViScope.m */; };
+		17DD6D94237FA7D200357A93 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34A13310C790023C5B7 /* ViSeparatorCell.m */; };
+		17DD6D95237FA7D200357A93 /* ViSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34C13310C7C0023C5B7 /* ViSnippet.m */; };
+		17DD6D96237FA7D200357A93 /* ViSymbolTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35213310C840023C5B7 /* ViSymbolTransform.m */; };
+		17DD6D97237FA7D200357A93 /* ViSyntaxContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35413310C860023C5B7 /* ViSyntaxContext.m */; };
+		17DD6D98237FA7D200357A93 /* ViLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17BA92AC1840440000B1252E /* ViLineNumberView.m */; };
+		17DD6D99237FA7D200357A93 /* ViSyntaxMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35613310C890023C5B7 /* ViSyntaxMatch.m */; };
+		17DD6D9A237FA7D200357A93 /* ViSyntaxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35813310C8C0023C5B7 /* ViSyntaxParser.m */; };
+		17DD6D9B237FA7D200357A93 /* ViCommandMenuItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35A13310C8E0023C5B7 /* ViCommandMenuItemView.m */; };
+		17DD6D9C237FA7D200357A93 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35C13310C910023C5B7 /* ViTagsDatabase.m */; };
+		17DD6D9D237FA7D200357A93 /* ViTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36013310C970023C5B7 /* ViTextStorage.m */; };
+		17DD6D9E237FA7D200357A93 /* ViTextView-bundle_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36113310C980023C5B7 /* ViTextView-bundle_commands.m */; };
+		17DD6D9F237FA7D200357A93 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36213310C9A0023C5B7 /* ViTextView-cursor.m */; };
+		17DD6DA0237FA7D200357A93 /* ViTextView-snippets.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36313310C9B0023C5B7 /* ViTextView-snippets.m */; };
+		17DD6DA1237FA7D200357A93 /* ViTextView-vi_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36413310C9D0023C5B7 /* ViTextView-vi_commands.m */; };
+		17DD6DA2237FA7D200357A93 /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36613310CA00023C5B7 /* ViTextView.m */; };
+		17DD6DA3237FA7D200357A93 /* ViTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36813310CA30023C5B7 /* ViTheme.m */; };
+		17DD6DA4237FA7D200357A93 /* ViThemeStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36A13310CA60023C5B7 /* ViThemeStore.m */; };
+		17DD6DA5237FA7D200357A93 /* ViToolbarPopUpButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36C13310CA90023C5B7 /* ViToolbarPopUpButtonCell.m */; };
+		17DD6DA6237FA7D200357A93 /* ViTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36E13310CAC0023C5B7 /* ViTransformer.m */; };
+		17DD6DA7237FA7D200357A93 /* ViWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF37013310CB00023C5B7 /* ViWebView.m */; };
+		17DD6DA8237FA7D200357A93 /* ViWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF37213310CB30023C5B7 /* ViWindow.m */; };
+		17DD6DA9237FA7D200357A93 /* ViWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF37413310CB60023C5B7 /* ViWindowController.m */; };
+		17DD6DAA237FA7D200357A93 /* CharDistribution.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF437133114AE0023C5B7 /* CharDistribution.cpp */; };
+		17DD6DAB237FA7D200357A93 /* JpCntx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF439133114AE0023C5B7 /* JpCntx.cpp */; };
+		17DD6DAC237FA7D200357A93 /* LangBulgarianModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF43B133114AE0023C5B7 /* LangBulgarianModel.cpp */; };
+		17DD6DAD237FA7D200357A93 /* LangCyrillicModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF43C133114AE0023C5B7 /* LangCyrillicModel.cpp */; };
+		17DD6DAE237FA7D200357A93 /* LangGreekModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF43D133114AE0023C5B7 /* LangGreekModel.cpp */; };
+		17DD6DAF237FA7D200357A93 /* LangHebrewModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF43E133114AE0023C5B7 /* LangHebrewModel.cpp */; };
+		17DD6DB0237FA7D200357A93 /* LangHungarianModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF43F133114AE0023C5B7 /* LangHungarianModel.cpp */; };
+		17DD6DB1237FA7D200357A93 /* LangThaiModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF440133114AE0023C5B7 /* LangThaiModel.cpp */; };
+		17DD6DB2237FA7D200357A93 /* nsBig5Prober.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF441133114AE0023C5B7 /* nsBig5Prober.cpp */; };
+		17DD6DB3237FA7D200357A93 /* nsCharSetProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF443133114AE0023C5B7 /* nsCharSetProber.cpp */; };
+		17DD6DB4237FA7D200357A93 /* nsEscCharsetProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF448133114AE0023C5B7 /* nsEscCharsetProber.cpp */; };
+		17DD6DB5237FA7D200357A93 /* nsEscSM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF44A133114AE0023C5B7 /* nsEscSM.cpp */; };
+		17DD6DB6237FA7D200357A93 /* ViGlyphGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6B2183348370092E695 /* ViGlyphGenerator.m */; };
+		17DD6DB7237FA7D200357A93 /* nsEUCJPProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF44B133114AE0023C5B7 /* nsEUCJPProber.cpp */; };
+		17DD6DB8237FA7D200357A93 /* nsEUCKRProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF44D133114AE0023C5B7 /* nsEUCKRProber.cpp */; };
+		17DD6DB9237FA7D200357A93 /* nsEUCTWProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF44F133114AE0023C5B7 /* nsEUCTWProber.cpp */; };
+		17DD6DBA237FA7D200357A93 /* nsGB2312Prober.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF451133114AE0023C5B7 /* nsGB2312Prober.cpp */; };
+		17DD6DBB237FA7D200357A93 /* nsHebrewProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF453133114AE0023C5B7 /* nsHebrewProber.cpp */; };
+		17DD6DBC237FA7D200357A93 /* nsLatin1Prober.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF455133114AE0023C5B7 /* nsLatin1Prober.cpp */; };
+		17DD6DBD237FA7D200357A93 /* nsMBCSGroupProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF457133114AE0023C5B7 /* nsMBCSGroupProber.cpp */; };
+		17DD6DBE237FA7D200357A93 /* nsMBCSSM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF459133114AE0023C5B7 /* nsMBCSSM.cpp */; };
+		17DD6DBF237FA7D200357A93 /* nsSBCharSetProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF45B133114AE0023C5B7 /* nsSBCharSetProber.cpp */; };
+		17DD6DC0237FA7D200357A93 /* nsSBCSGroupProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF45D133114AE0023C5B7 /* nsSBCSGroupProber.cpp */; };
+		17DD6DC1237FA7D200357A93 /* nsSJISProber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF45F133114AE0023C5B7 /* nsSJISProber.cpp */; };
+		17DD6DC2237FA7D200357A93 /* nsUniversalDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF461133114AE0023C5B7 /* nsUniversalDetector.cpp */; };
+		17DD6DC3237FA7D200357A93 /* nsUTF8Prober.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF463133114AE0023C5B7 /* nsUTF8Prober.cpp */; };
+		17DD6DC4237FA7D200357A93 /* regcomp.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4861331150E0023C5B7 /* regcomp.c */; };
+		17DD6DC5237FA7D200357A93 /* regenc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4871331150E0023C5B7 /* regenc.c */; };
+		17DD6DC6237FA7D200357A93 /* regerror.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4891331150E0023C5B7 /* regerror.c */; };
+		17DD6DC7237FA7D200357A93 /* regexec.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF48A1331150E0023C5B7 /* regexec.c */; };
+		17DD6DC8237FA7D200357A93 /* regext.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF48B1331150E0023C5B7 /* regext.c */; };
+		17DD6DC9237FA7D200357A93 /* reggnu.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF48C1331150E0023C5B7 /* reggnu.c */; };
+		17DD6DCA237FA7D200357A93 /* regparse.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF48E1331150E0023C5B7 /* regparse.c */; };
+		17DD6DCB237FA7D200357A93 /* regposerr.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4901331150E0023C5B7 /* regposerr.c */; };
+		17DD6DCC237FA7D200357A93 /* regposix.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4911331150E0023C5B7 /* regposix.c */; };
+		17DD6DCD237FA7D200357A93 /* regsyntax.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4921331150E0023C5B7 /* regsyntax.c */; };
+		17DD6DCE237FA7D200357A93 /* regtrav.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4931331150E0023C5B7 /* regtrav.c */; };
+		17DD6DCF237FA7D200357A93 /* regversion.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4941331150E0023C5B7 /* regversion.c */; };
+		17DD6DD0237FA7D200357A93 /* st.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4951331150E0023C5B7 /* st.c */; };
+		17DD6DD1237FA7D200357A93 /* ascii.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4A5133115270023C5B7 /* ascii.c */; };
+		17DD6DD2237FA7D200357A93 /* big5.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4A6133115270023C5B7 /* big5.c */; };
+		17DD6DD3237FA7D200357A93 /* cp1251.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4A7133115270023C5B7 /* cp1251.c */; };
+		17DD6DD4237FA7D200357A93 /* euc_jp.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4A8133115270023C5B7 /* euc_jp.c */; };
+		17DD6DD5237FA7D200357A93 /* euc_kr.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4A9133115270023C5B7 /* euc_kr.c */; };
+		17DD6DD6237FA7D200357A93 /* euc_tw.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4AA133115270023C5B7 /* euc_tw.c */; };
+		17DD6DD7237FA7D200357A93 /* gb18030.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4AB133115270023C5B7 /* gb18030.c */; };
+		17DD6DD8237FA7D200357A93 /* iso8859_1.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4AC133115270023C5B7 /* iso8859_1.c */; };
+		17DD6DD9237FA7D200357A93 /* iso8859_2.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4AD133115270023C5B7 /* iso8859_2.c */; };
+		17DD6DDA237FA7D200357A93 /* iso8859_3.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4AE133115270023C5B7 /* iso8859_3.c */; };
+		17DD6DDB237FA7D200357A93 /* iso8859_4.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4AF133115270023C5B7 /* iso8859_4.c */; };
+		17DD6DDC237FA7D200357A93 /* iso8859_5.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B0133115270023C5B7 /* iso8859_5.c */; };
+		17DD6DDD237FA7D200357A93 /* iso8859_6.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B1133115270023C5B7 /* iso8859_6.c */; };
+		17DD6DDE237FA7D200357A93 /* iso8859_7.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B2133115270023C5B7 /* iso8859_7.c */; };
+		17DD6DDF237FA7D200357A93 /* iso8859_8.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B3133115270023C5B7 /* iso8859_8.c */; };
+		17DD6DE0237FA7D200357A93 /* iso8859_9.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B4133115270023C5B7 /* iso8859_9.c */; };
+		17DD6DE1237FA7D200357A93 /* iso8859_10.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B5133115270023C5B7 /* iso8859_10.c */; };
+		17DD6DE2237FA7D200357A93 /* iso8859_11.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B6133115270023C5B7 /* iso8859_11.c */; };
+		17DD6DE3237FA7D200357A93 /* iso8859_13.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B7133115270023C5B7 /* iso8859_13.c */; };
+		17DD6DE4237FA7D200357A93 /* iso8859_14.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B8133115270023C5B7 /* iso8859_14.c */; };
+		17DD6DE5237FA7D200357A93 /* iso8859_15.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4B9133115270023C5B7 /* iso8859_15.c */; };
+		17DD6DE6237FA7D200357A93 /* iso8859_16.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4BA133115270023C5B7 /* iso8859_16.c */; };
+		17DD6DE7237FA7D200357A93 /* koi8_r.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4BB133115270023C5B7 /* koi8_r.c */; };
+		17DD6DE8237FA7D200357A93 /* koi8.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4BC133115270023C5B7 /* koi8.c */; };
+		17DD6DE9237FA7D200357A93 /* sjis.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4BD133115270023C5B7 /* sjis.c */; };
+		17DD6DEA237FA7D200357A93 /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4BE133115270023C5B7 /* unicode.c */; };
+		17DD6DEB237FA7D200357A93 /* utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4BF133115270023C5B7 /* utf8.c */; };
+		17DD6DEC237FA7D200357A93 /* utf16_be.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4C0133115270023C5B7 /* utf16_be.c */; };
+		17DD6DED237FA7D200357A93 /* utf16_le.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4C1133115270023C5B7 /* utf16_le.c */; };
+		17DD6DEE237FA7D200357A93 /* utf32_be.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4C2133115270023C5B7 /* utf32_be.c */; };
+		17DD6DEF237FA7D200357A93 /* utf32_le.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF4C3133115270023C5B7 /* utf32_le.c */; };
+		17DD6DF0237FA7D200357A93 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F51331383C002B04DE /* SBJsonParser.m */; };
+		17DD6DF1237FA7D200357A93 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F71331383C002B04DE /* SBJsonStreamParser.m */; };
+		17DD6DF2237FA7D200357A93 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F91331383C002B04DE /* SBJsonStreamParserAdapter.m */; };
+		17DD6DF3237FA7D200357A93 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FB1331383C002B04DE /* SBJsonStreamParserState.m */; };
+		17DD6DF4237FA7D200357A93 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FD1331383C002B04DE /* SBJsonStreamWriter.m */; };
+		17DD6DF5237FA7D200357A93 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FF1331383C002B04DE /* SBJsonStreamWriterState.m */; };
+		17DD6DF6237FA7D200357A93 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347011331383C002B04DE /* SBJsonTokeniser.m */; };
+		17DD6DF7237FA7D200357A93 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347031331383C002B04DE /* SBJsonWriter.m */; };
+		17DD6DF8237FA7D200357A93 /* NSEvent-keyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */; };
+		17DD6DF9237FA7D200357A93 /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA3133F72E600D81D33 /* ViCommand.m */; };
+		17DD6DFA237FA7D200357A93 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
+		17DD6DFB237FA7D200357A93 /* ViKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69913430176006981AE /* ViKeyManager.m */; };
+		17DD6DFC237FA7D200357A93 /* ViRegisterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69D134326A6006981AE /* ViRegisterManager.m */; };
+		17DD6DFD237FA7D200357A93 /* ViMacro.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD6B113445C80006981AE /* ViMacro.m */; };
+		17DD6DFE237FA7D200357A93 /* ExTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26065D134849CC002C86FB /* ExTextField.m */; };
+		17DD6DFF237FA7D200357A93 /* ViCompletionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A260667134A1704002C86FB /* ViCompletionController.m */; };
+		17DD6E00237FA7D200357A93 /* ViTypesetter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6BA1833DB060092E695 /* ViTypesetter.m */; };
+		17DD6E01237FA7D200357A93 /* ViCompletionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26066A134A4F13002C86FB /* ViCompletionView.m */; };
+		17DD6E02237FA7D200357A93 /* ViCompletionWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26066D134B0024002C86FB /* ViCompletionWindow.m */; };
+		17DD6E03237FA7D200357A93 /* ViCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A260673134DF8D7002C86FB /* ViCompletion.m */; };
+		17DD6E04237FA7D200357A93 /* ViSymbolController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26067713505AEF002C86FB /* ViSymbolController.m */; };
+		17DD6E05237FA7D200357A93 /* ViPreferencePane.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606A7135B1924002C86FB /* ViPreferencePane.m */; };
+		17DD6E06237FA7D200357A93 /* ViPreferencePaneGeneral.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606A9135B1924002C86FB /* ViPreferencePaneGeneral.m */; };
+		17DD6E07237FA7D200357A93 /* ViPreferencePaneTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606AB135B1924002C86FB /* ViPreferencePaneTheme.m */; };
+		17DD6E08237FA7D200357A93 /* ViPreferencePaneBundles.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606B0135B1C4F002C86FB /* ViPreferencePaneBundles.m */; };
+		17DD6E09237FA7D200357A93 /* ViPreferencePaneEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */; };
+		17DD6E0A237FA7D200357A93 /* ViFileURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF73FA13654C8500D75E1E /* ViFileURLHandler.m */; };
+		17DD6E0B237FA7D200357A93 /* ViURLManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF73FC13654C8500D75E1E /* ViURLManager.m */; };
+		17DD6E0C237FA7D200357A93 /* ViSFTPURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF74001366938600D75E1E /* ViSFTPURLHandler.m */; };
+		17DD6E0D237FA7D200357A93 /* ViHTTPURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF74031366A4CF00D75E1E /* ViHTTPURLHandler.m */; };
+		17DD6E0E237FA7D200357A93 /* ViBufferedStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF740E13680F4900D75E1E /* ViBufferedStream.m */; };
+		17DD6E0F237FA7D200357A93 /* ViBufferCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA93E13707177001FC553 /* ViBufferCompletion.m */; };
+		17DD6E10237FA7D200357A93 /* ViFileCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94013707177001FC553 /* ViFileCompletion.m */; };
+		17DD6E11237FA7D200357A93 /* ViWordCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94213707177001FC553 /* ViWordCompletion.m */; };
+		17DD6E12237FA7D200357A93 /* ViPreferencePaneAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */; };
+		17DD6E13237FA7D200357A93 /* ExCommandCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD5D5F1395717A00FDFFA6 /* ExCommandCompletion.m */; };
+		17DD6E14237FA7D200357A93 /* ViSyntaxCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD5D621395736900FDFFA6 /* ViSyntaxCompletion.m */; };
+		17DD6E15237FA7D200357A93 /* ViEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4D13A3583100126E32 /* ViEventManager.m */; };
+		17DD6E16237FA7D200357A93 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4F13A4083A00126E32 /* ViTextView-ex_commands.m */; };
+		17DD6E17237FA7D200357A93 /* NSURL-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA48E4C13A60C10009CC5D7 /* NSURL-additions.m */; };
+		17DD6E18237FA7D200357A93 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
+		17DD6E19237FA7D200357A93 /* NSView-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA48E4E13A60C10009CC5D7 /* NSView-additions.m */; };
+		17DD6E1A237FA7D200357A93 /* ExAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4DB02D13B898B400FAE096 /* ExAddress.m */; };
+		17DD6E1B237FA7D200357A93 /* ExMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFF8E013EC341C0040DB4E /* ExMap.m */; };
+		17DD6E1C237FA7D200357A93 /* ExParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFF8E113EC341C0040DB4E /* ExParser.m */; };
+		17DD6E1D237FA7D200357A93 /* ViBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4A01C113F94D3F00CCDBA6 /* ViBgView.m */; };
+		17DD6E1E237FA7D200357A93 /* ViPathComponentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF140A3140A8D0B0075677F /* ViPathComponentCell.m */; };
+		17DD6E1F237FA7D200357A93 /* ViPathCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF140A7140A9C110075677F /* ViPathCell.m */; };
+		17DD6E20237FA7D200357A93 /* NSOutlineView-vimotions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B1CF614151B0F00252451 /* NSOutlineView-vimotions.m */; };
+		17DD6E21237FA7D200357A93 /* NSTableView-vimotions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B1CF814151B0F00252451 /* NSTableView-vimotions.m */; };
+		17DD6E22237FA7D200357A93 /* NSTask-streaming.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB6F72A14153234000F3578 /* NSTask-streaming.m */; };
+		17DD6E23237FA7D200357A93 /* ViTaskRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB6F73114160F9B000F3578 /* ViTaskRunner.m */; };
+		17DD6E24237FA7D200357A93 /* ViFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB6F74714164B0C000F3578 /* ViFile.m */; };
+		17DD6E25237FA7D200357A93 /* ViMarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0831971418FE9D00D1805D /* ViMarkManager.m */; };
+		17DD6E26237FA7D200357A93 /* ViMarkInspector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFDFC1141A089C00D4DBE1 /* ViMarkInspector.m */; };
+		17DD6E27237FA7D200357A93 /* NSMenu-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5A678B14207B83003E92EC /* NSMenu-additions.m */; };
+		17DD6E28237FA7D200357A93 /* NSWindow-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF6A7021434ABB200FB373B /* NSWindow-additions.m */; };
+		17DD6E29237FA7D200357A93 /* ViViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF6A7061435BAA300FB373B /* ViViewController.m */; };
+		17DD6E2A237FA7D200357A93 /* Nu.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA9272614D5B55900F0E02F /* Nu.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		17DD6E2B237FA7D200357A93 /* ViFold.m in Sources */ = {isa = PBXBuildFile; fileRef = 177AC29418307E6C002C9647 /* ViFold.m */; };
+		17DD6E2C237FA7D200357A93 /* ViStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E3C815E0499800F81089 /* ViStatusView.m */; };
+		17DD6E2D237FA7D200357A93 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
+		17DD6E2E237FA7D200357A93 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */; };
+		17DD6E2F237FA7D200357A93 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */; };
+		17DD6E30237FA7D200357A93 /* SFBCrashReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12317CF0354000C25C6 /* SFBCrashReporter.m */; };
+		17DD6E31237FA7D200357A93 /* SFBCrashReporterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */; };
+		17DD6E32237FA7D200357A93 /* SFBSystemInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */; };
+		17DD6E33237FA7D200357A93 /* GenerateFormData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */; };
+		17DD6E34237FA7D200357A93 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */; };
+		17DD6E39237FA7D200357A93 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1730CE0717CF058D00A1DA2C /* AddressBook.framework */; };
+		17DD6E3A237FA7D200357A93 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */; };
+		17DD6E3B237FA7D200357A93 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF2D513310AF90023C5B7 /* WebKit.framework */; };
+		17DD6E3C237FA7D200357A93 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF293133109C20023C5B7 /* Cocoa.framework */; };
+		17DD6E41237FA7D200357A93 /* Bundles in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D11331182E002B04DE /* Bundles */; };
+		17DD6E42237FA7D200357A93 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF29C133109C20023C5B7 /* InfoPlist.strings */; };
+		17DD6E43237FA7D200357A93 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF2A2133109C20023C5B7 /* Credits.rtf */; };
+		17DD6E44237FA7D200357A93 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF2A8133109C20023C5B7 /* MainMenu.xib */; };
+		17DD6E45237FA7D200357A93 /* CommandOutputWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A43469C13311615002B04DE /* CommandOutputWindow.xib */; };
+		17DD6E46237FA7D200357A93 /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A43469E13311615002B04DE /* PreferenceWindow.xib */; };
+		17DD6E47237FA7D200357A93 /* ViDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346A013311615002B04DE /* ViDocument.xib */; };
+		17DD6E48237FA7D200357A93 /* ViDocumentWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346A213311615002B04DE /* ViDocumentWindow.xib */; };
+		17DD6E49237FA7D200357A93 /* actionbarbg.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346A913311694002B04DE /* actionbarbg.png */; };
+		17DD6E4A237FA7D200357A93 /* actionmenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346AA13311694002B04DE /* actionmenu.png */; };
+		17DD6E4B237FA7D200357A93 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346AB13311694002B04DE /* add.png */; };
+		17DD6E4C237FA7D200357A93 /* bookmark.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346AC13311694002B04DE /* bookmark.png */; };
+		17DD6E4D237FA7D200357A93 /* class.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346AD13311694002B04DE /* class.png */; };
+		17DD6E4E237FA7D200357A93 /* define.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346AE13311694002B04DE /* define.png */; };
+		17DD6E4F237FA7D200357A93 /* function.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346AF13311694002B04DE /* function.png */; };
+		17DD6E50237FA7D200357A93 /* module.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B013311694002B04DE /* module.png */; };
+		17DD6E51237FA7D200357A93 /* overflowImage.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B113311694002B04DE /* overflowImage.tiff */; };
+		17DD6E52237FA7D200357A93 /* overflowImagePressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B213311694002B04DE /* overflowImagePressed.tif */; };
+		17DD6E53237FA7D200357A93 /* pi.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B313311694002B04DE /* pi.png */; };
+		17DD6E54237FA7D200357A93 /* resizehandle.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B413311694002B04DE /* resizehandle.png */; };
+		17DD6E55237FA7D200357A93 /* TabClose_Front_Pressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B513311694002B04DE /* TabClose_Front_Pressed.tif */; };
+		17DD6E56237FA7D200357A93 /* TabClose_Front_Rollover.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B613311694002B04DE /* TabClose_Front_Rollover.tif */; };
+		17DD6E57237FA7D200357A93 /* TabClose_Front.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B713311694002B04DE /* TabClose_Front.tif */; };
+		17DD6E58237FA7D200357A93 /* TabNewMetal.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B813311694002B04DE /* TabNewMetal.png */; };
+		17DD6E59237FA7D200357A93 /* TabNewMetalPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B913311694002B04DE /* TabNewMetalPressed.png */; };
+		17DD6E5A237FA7D200357A93 /* TabNewMetalRollover.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346BA13311694002B04DE /* TabNewMetalRollover.png */; };
+		17DD6E5B237FA7D200357A93 /* tag.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346BB13311694002B04DE /* tag.png */; };
+		17DD6E5C237FA7D200357A93 /* Support in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D21331182E002B04DE /* Support */; };
+		17DD6E5D237FA7D200357A93 /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D31331182E002B04DE /* Themes */; };
+		17DD6E5E237FA7D200357A93 /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D71331239E002B04DE /* symbol-icons.plist */; };
+		17DD6E5F237FA7D200357A93 /* vico.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE40013366DC0002E82B1 /* vico.nu */; };
+		17DD6E60237FA7D200357A93 /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
+		17DD6E61237FA7D200357A93 /* keys.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AB10BAB13408B6600D81D33 /* keys.nu */; };
+		17DD6E62237FA7D200357A93 /* CompletionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A26066F134C50C3002C86FB /* CompletionWindow.xib */; };
+		17DD6E63237FA7D200357A93 /* ThemePrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2606A2135B17F2002C86FB /* ThemePrefs.xib */; };
+		17DD6E64237FA7D200357A93 /* BundlePrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2606B2135B1C63002C86FB /* BundlePrefs.xib */; };
+		17DD6E65237FA7D200357A93 /* EditPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A66526F135B21D700A2F93C /* EditPrefs.xib */; };
+		17DD6E66237FA7D200357A93 /* GeneralPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A665276135B288700A2F93C /* GeneralPrefs.xib */; };
+		17DD6E67237FA7D200357A93 /* Credits.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9AAF73E1135C931600D75E1E /* Credits.txt */; };
+		17DD6E68237FA7D200357A93 /* AdvancedPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AF71075137BC12900EC858E /* AdvancedPrefs.xib */; };
+		17DD6E69237FA7D200357A93 /* ex.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A57990013F0189A00191109 /* ex.nu */; };
+		17DD6E6A237FA7D200357A93 /* header.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AFC857913F432A600B4FF09 /* header.png */; };
+		17DD6E6B237FA7D200357A93 /* AliasBadgeIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9AF29C23140CF511000CB1CB /* AliasBadgeIcon.icns */; };
+		17DD6E6C237FA7D200357A93 /* par.doc in Resources */ = {isa = PBXBuildFile; fileRef = 9A880833141213BE001F8769 /* par.doc */; };
+		17DD6E6D237FA7D200357A93 /* WaitProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AB6F72D14160751000F3578 /* WaitProgress.xib */; };
+		17DD6E6E237FA7D200357A93 /* MarkInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ACFDFBC141A084700D4DBE1 /* MarkInspector.xib */; };
+		17DD6E6F237FA7D200357A93 /* beautify.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272814D5B58E00F0E02F /* beautify.nu */; };
+		17DD6E70237FA7D200357A93 /* status.nu in Resources */ = {isa = PBXBuildFile; fileRef = 1732DAF8181EEC3600890055 /* status.nu */; };
+		17DD6E71237FA7D200357A93 /* bridgesupport.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272914D5B58E00F0E02F /* bridgesupport.nu */; };
+		17DD6E72237FA7D200357A93 /* cblocks.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272A14D5B58E00F0E02F /* cblocks.nu */; };
+		17DD6E73237FA7D200357A93 /* cocoa.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272B14D5B58E00F0E02F /* cocoa.nu */; };
+		17DD6E74237FA7D200357A93 /* console.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272C14D5B58E00F0E02F /* console.nu */; };
+		17DD6E75237FA7D200357A93 /* coredata.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272D14D5B58E00F0E02F /* coredata.nu */; };
+		17DD6E76237FA7D200357A93 /* doc.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272E14D5B58E00F0E02F /* doc.nu */; };
+		17DD6E77237FA7D200357A93 /* fscript.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272F14D5B58E00F0E02F /* fscript.nu */; };
+		17DD6E78237FA7D200357A93 /* generate.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273014D5B58E00F0E02F /* generate.nu */; };
+		17DD6E79237FA7D200357A93 /* help.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273114D5B58E00F0E02F /* help.nu */; };
+		17DD6E7A237FA7D200357A93 /* match.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273214D5B58E00F0E02F /* match.nu */; };
+		17DD6E7B237FA7D200357A93 /* SFBCrashReporterWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */; };
+		17DD6E7C237FA7D200357A93 /* math.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273314D5B58E00F0E02F /* math.nu */; };
+		17DD6E7D237FA7D200357A93 /* menu.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273414D5B58E00F0E02F /* menu.nu */; };
+		17DD6E7E237FA7D200357A93 /* nibtools.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273514D5B58E00F0E02F /* nibtools.nu */; };
+		17DD6E7F237FA7D200357A93 /* nu.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273614D5B58E00F0E02F /* nu.nu */; };
+		17DD6E80237FA7D200357A93 /* template.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273714D5B58E00F0E02F /* template.nu */; };
+		17DD6E81237FA7D200357A93 /* test.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273814D5B58E00F0E02F /* test.nu */; };
+		17DD6E84237FA7D200357A93 /* par in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A288E1E1398EA6F00258451 /* par */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		17DD6E85237FA7D200357A93 /* vicotool in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A4346DD1331257A002B04DE /* vicotool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		17E66CAE17D12DAF006552F4 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */; };
 		17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E3C815E0499800F81089 /* ViStatusView.m */; };
 		9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0831971418FE9D00D1805D /* ViMarkManager.m */; };
@@ -322,11 +600,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
+		17DD6E86237FA7D200357A93 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.lemon";
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 1;
+			outputFiles = (
+				"$(INPUT_FILE_DIR)/$(INPUT_FILE_BASE).c",
+			);
+			script = "LEMPAR=\"${PROJECT_DIR}/lemon/lempar.c\" \"${BUILT_PRODUCTS_DIR}/lemon\" -s \"${INPUT_FILE_PATH}\"\n";
+		};
 		9A2EF41D133110A20023C5B7 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
 			filePatterns = "*.lemon";
 			fileType = pattern.proxy;
+			inputFiles = (
+			);
 			isEditable = 1;
 			outputFiles = (
 				"$(INPUT_FILE_DIR)/$(INPUT_FILE_BASE).c",
@@ -336,6 +629,27 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
+		17DD6D60237FA7D200357A93 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A288E1D1398EA6F00258451;
+			remoteInfo = par;
+		};
+		17DD6D62237FA7D200357A93 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A4346DC1331257A002B04DE;
+			remoteInfo = vico;
+		};
+		17DD6D64237FA7D200357A93 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A2EF40F13310F4D0023C5B7;
+			remoteInfo = lemon;
+		};
 		17E8AB4B181CCF9C00233393 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 17E8AB43181CCF9C00233393 /* Sparkle.xcodeproj */;
@@ -402,6 +716,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		17DD6E83237FA7D200357A93 /* Copy Executables */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				17DD6E84237FA7D200357A93 /* par in Copy Executables */,
+				17DD6E85237FA7D200357A93 /* vicotool in Copy Executables */,
+			);
+			name = "Copy Executables";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A2EF40E13310F4D0023C5B7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -456,7 +782,6 @@
 		1732DAF6181EEC3600890055 /* NSCollection-enumeration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSCollection-enumeration.h"; sourceTree = "<group>"; };
 		1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSCollection-enumeration.m"; sourceTree = "<group>"; };
 		1732DAF8181EEC3600890055 /* status.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = status.nu; sourceTree = "<group>"; };
-		1732DB02181EF25000890055 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = app/en.lproj/SFBCrashReporterWindow.xib; sourceTree = "<group>"; };
 		1735A6B1183348370092E695 /* ViGlyphGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViGlyphGenerator.h; sourceTree = "<group>"; };
 		1735A6B2183348370092E695 /* ViGlyphGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViGlyphGenerator.m; sourceTree = "<group>"; };
 		1735A6B91833DB060092E695 /* ViTypesetter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTypesetter.h; sourceTree = "<group>"; };
@@ -480,6 +805,22 @@
 		17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBCrashReporterWindowController.m; sourceTree = "<group>"; };
 		17D8A12617CF0354000C25C6 /* SFBSystemInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFBSystemInformation.h; sourceTree = "<group>"; };
 		17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBSystemInformation.m; sourceTree = "<group>"; };
+		17DD6E8B237FA7D200357A93 /* Vico2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vico2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		17DD6E8C237FA7D300357A93 /* Vico copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Vico copy-Info.plist"; path = "/Users/shadowfiend/github.com/vicoapp/vico/Vico copy-Info.plist"; sourceTree = "<absolute>"; };
+		17DD6E8D237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = app/Base.lproj/SFBCrashReporterWindow.xib; sourceTree = "<group>"; };
+		17DD6E8E237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/CommandOutputWindow.xib; sourceTree = "<group>"; };
+		17DD6E8F237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/AdvancedPrefs.xib; sourceTree = "<group>"; };
+		17DD6E90237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/BundlePrefs.xib; sourceTree = "<group>"; };
+		17DD6E91237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = app/Base.lproj/EditPrefs.xib; sourceTree = "<group>"; };
+		17DD6E92237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/GeneralPrefs.xib; sourceTree = "<group>"; };
+		17DD6E93237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferenceWindow.xib; sourceTree = "<group>"; };
+		17DD6E94237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ThemePrefs.xib; sourceTree = "<group>"; };
+		17DD6E95237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ViDocument.xib; sourceTree = "<group>"; };
+		17DD6E96237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ViDocumentWindow.xib; sourceTree = "<group>"; };
+		17DD6E97237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		17DD6E98237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/CompletionWindow.xib; sourceTree = "<group>"; };
+		17DD6E99237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/WaitProgress.xib; sourceTree = "<group>"; };
+		17DD6E9A237FAC5400357A93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MarkInspector.xib; sourceTree = "<group>"; };
 		17E8AB43181CCF9C00233393 /* Sparkle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Sparkle.xcodeproj; path = sparkle/Sparkle.xcodeproj; sourceTree = "<group>"; };
 		17F2E3C715E0499800F81089 /* ViStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViStatusView.h; sourceTree = "<group>"; };
 		17F2E3C815E0499800F81089 /* ViStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViStatusView.m; sourceTree = "<group>"; };
@@ -493,13 +834,11 @@
 		9A26066A134A4F13002C86FB /* ViCompletionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCompletionView.m; sourceTree = "<group>"; };
 		9A26066C134B0024002C86FB /* ViCompletionWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCompletionWindow.h; sourceTree = "<group>"; };
 		9A26066D134B0024002C86FB /* ViCompletionWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCompletionWindow.m; sourceTree = "<group>"; };
-		9A260670134C50C3002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/CompletionWindow.xib; sourceTree = "<group>"; };
 		9A260672134DF8D7002C86FB /* ViCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCompletion.h; sourceTree = "<group>"; };
 		9A260673134DF8D7002C86FB /* ViCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCompletion.m; sourceTree = "<group>"; };
 		9A26067613505AEF002C86FB /* ViSymbolController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbolController.h; sourceTree = "<group>"; };
 		9A26067713505AEF002C86FB /* ViSymbolController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolController.m; sourceTree = "<group>"; };
 		9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = usr/lib/libcrypto.0.9.8.dylib; sourceTree = SDKROOT; };
-		9A2606A3135B17F2002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ThemePrefs.xib; sourceTree = "<group>"; };
 		9A2606A6135B1924002C86FB /* ViPreferencePane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePane.h; sourceTree = "<group>"; };
 		9A2606A7135B1924002C86FB /* ViPreferencePane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePane.m; sourceTree = "<group>"; };
 		9A2606A8135B1924002C86FB /* ViPreferencePaneGeneral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneGeneral.h; sourceTree = "<group>"; };
@@ -508,7 +847,6 @@
 		9A2606AB135B1924002C86FB /* ViPreferencePaneTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneTheme.m; sourceTree = "<group>"; };
 		9A2606AF135B1C4F002C86FB /* ViPreferencePaneBundles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneBundles.h; sourceTree = "<group>"; };
 		9A2606B0135B1C4F002C86FB /* ViPreferencePaneBundles.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneBundles.m; sourceTree = "<group>"; };
-		9A2606B3135B1C63002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/BundlePrefs.xib; sourceTree = "<group>"; };
 		9A288E1E1398EA6F00258451 /* par */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = par; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A288E281398EA9C00258451 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
 		9A288E291398EA9C00258451 /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffer.h; sourceTree = "<group>"; };
@@ -526,7 +864,6 @@
 		9A2EF29F133109C20023C5B7 /* Vico-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Vico-Prefix.pch"; sourceTree = "<group>"; };
 		9A2EF2A0133109C20023C5B7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9A2EF2A3133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
-		9A2EF2A9133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9A2EF2B0133109C20023C5B7 /* Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF2B6133109C20023C5B7 /* tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "tests-Info.plist"; sourceTree = "<group>"; };
 		9A2EF2B8133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -772,10 +1109,6 @@
 		9A2EF4C1133115270023C5B7 /* utf16_le.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = utf16_le.c; path = oniguruma/enc/utf16_le.c; sourceTree = SOURCE_ROOT; };
 		9A2EF4C2133115270023C5B7 /* utf32_be.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = utf32_be.c; path = oniguruma/enc/utf32_be.c; sourceTree = SOURCE_ROOT; };
 		9A2EF4C3133115270023C5B7 /* utf32_le.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = utf32_le.c; path = oniguruma/enc/utf32_le.c; sourceTree = SOURCE_ROOT; };
-		9A43469D13311615002B04DE /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/CommandOutputWindow.xib; sourceTree = "<group>"; };
-		9A43469F13311615002B04DE /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/PreferenceWindow.xib; sourceTree = "<group>"; };
-		9A4346A113311615002B04DE /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViDocument.xib; sourceTree = "<group>"; };
-		9A4346A313311615002B04DE /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViDocumentWindow.xib; sourceTree = "<group>"; };
 		9A4346A913311694002B04DE /* actionbarbg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = actionbarbg.png; path = Images/actionbarbg.png; sourceTree = SOURCE_ROOT; };
 		9A4346AA13311694002B04DE /* actionmenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = actionmenu.png; path = Images/actionmenu.png; sourceTree = SOURCE_ROOT; };
 		9A4346AB13311694002B04DE /* add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add.png; path = Images/add.png; sourceTree = SOURCE_ROOT; };
@@ -837,10 +1170,8 @@
 		9A5DD6B013445C80006981AE /* ViMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMacro.h; sourceTree = "<group>"; };
 		9A5DD6B113445C80006981AE /* ViMacro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMacro.m; sourceTree = "<group>"; };
 		9A5EE40013366DC0002E82B1 /* vico.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vico.nu; sourceTree = "<group>"; };
-		9A665270135B21D700A2F93C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = app/en.lproj/EditPrefs.xib; sourceTree = "<group>"; };
 		9A665273135B22E300A2F93C /* ViPreferencePaneEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneEdit.h; sourceTree = "<group>"; };
 		9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneEdit.m; sourceTree = "<group>"; };
-		9A665277135B288700A2F93C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GeneralPrefs.xib; sourceTree = "<group>"; };
 		9A7B1CF514151B0F00252451 /* NSOutlineView-vimotions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSOutlineView-vimotions.h"; sourceTree = "<group>"; };
 		9A7B1CF614151B0F00252451 /* NSOutlineView-vimotions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSOutlineView-vimotions.m"; sourceTree = "<group>"; };
 		9A7B1CF714151B0F00252451 /* NSTableView-vimotions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTableView-vimotions.h"; sourceTree = "<group>"; };
@@ -896,7 +1227,6 @@
 		9AB10BAD1340BAE700D81D33 /* TestViMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViMap.m; sourceTree = "<group>"; };
 		9AB6F72914153234000F3578 /* NSTask-streaming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTask-streaming.h"; sourceTree = "<group>"; };
 		9AB6F72A14153234000F3578 /* NSTask-streaming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTask-streaming.m"; sourceTree = "<group>"; };
-		9AB6F72E14160751000F3578 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/WaitProgress.xib; sourceTree = "<group>"; };
 		9AB6F73014160F9B000F3578 /* ViTaskRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTaskRunner.h; sourceTree = "<group>"; };
 		9AB6F73114160F9B000F3578 /* ViTaskRunner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTaskRunner.m; sourceTree = "<group>"; };
 		9AB6F74614164B0C000F3578 /* ViFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFile.h; sourceTree = "<group>"; };
@@ -907,7 +1237,6 @@
 		9ACAA94013707177001FC553 /* ViFileCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFileCompletion.m; sourceTree = "<group>"; };
 		9ACAA94113707177001FC553 /* ViWordCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWordCompletion.h; sourceTree = "<group>"; };
 		9ACAA94213707177001FC553 /* ViWordCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWordCompletion.m; sourceTree = "<group>"; };
-		9ACFDFBD141A084700D4DBE1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MarkInspector.xib; sourceTree = "<group>"; };
 		9ACFDFC0141A089C00D4DBE1 /* ViMarkInspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMarkInspector.h; sourceTree = "<group>"; };
 		9ACFDFC1141A089C00D4DBE1 /* ViMarkInspector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMarkInspector.m; sourceTree = "<group>"; };
 		9ACFF8DF13EC341C0040DB4E /* ExMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExMap.h; sourceTree = "<group>"; };
@@ -925,13 +1254,23 @@
 		9AF6A7021434ABB200FB373B /* NSWindow-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSWindow-additions.m"; sourceTree = "<group>"; };
 		9AF6A7051435BAA300FB373B /* ViViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViViewController.h; sourceTree = "<group>"; };
 		9AF6A7061435BAA300FB373B /* ViViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViViewController.m; sourceTree = "<group>"; };
-		9AF71076137BC12900EC858E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AdvancedPrefs.xib; sourceTree = "<group>"; };
 		9AF71079137BC31300EC858E /* ViPreferencePaneAdvanced.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneAdvanced.h; sourceTree = "<group>"; };
 		9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneAdvanced.m; sourceTree = "<group>"; };
 		9AFC857913F432A600B4FF09 /* header.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = header.png; path = Images/header.png; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		17DD6E37237FA7D200357A93 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				17DD6E39237FA7D200357A93 /* AddressBook.framework in Frameworks */,
+				17DD6E3A237FA7D200357A93 /* Carbon.framework in Frameworks */,
+				17DD6E3B237FA7D200357A93 /* WebKit.framework in Frameworks */,
+				17DD6E3C237FA7D200357A93 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A288E1B1398EA6F00258451 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1117,6 +1456,7 @@
 				9A2EF292133109C20023C5B7 /* Frameworks */,
 				9A2EF290133109C10023C5B7 /* Products */,
 				17E8AB43181CCF9C00233393 /* Sparkle.xcodeproj */,
+				17DD6E8C237FA7D300357A93 /* Vico copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1128,6 +1468,7 @@
 				9A2EF41013310F4D0023C5B7 /* lemon */,
 				9A4346DD1331257A002B04DE /* vicotool */,
 				9A288E1E1398EA6F00258451 /* par */,
+				17DD6E8B237FA7D200357A93 /* Vico2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1683,6 +2024,32 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		17DD6D5E237FA7D200357A93 /* Vico2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 17DD6E87237FA7D200357A93 /* Build configuration list for PBXNativeTarget "Vico2" */;
+			buildPhases = (
+				17DD6D65237FA7D200357A93 /* Sources */,
+				17DD6E37237FA7D200357A93 /* Frameworks */,
+				17DD6E3D237FA7D200357A93 /* Set version numbers in Info.plist */,
+				17DD6E3E237FA7D200357A93 /* Download bundle repo from GitHub */,
+				17DD6E3F237FA7D200357A93 /* Checkout bundles from GitHub */,
+				17DD6E40237FA7D200357A93 /* Resources */,
+				17DD6E82237FA7D200357A93 /* Build help bundle */,
+				17DD6E83237FA7D200357A93 /* Copy Executables */,
+			);
+			buildRules = (
+				17DD6E86237FA7D200357A93 /* PBXBuildRule */,
+			);
+			dependencies = (
+				17DD6D5F237FA7D200357A93 /* PBXTargetDependency */,
+				17DD6D61237FA7D200357A93 /* PBXTargetDependency */,
+				17DD6D63237FA7D200357A93 /* PBXTargetDependency */,
+			);
+			name = Vico2;
+			productName = Vico;
+			productReference = 17DD6E8B237FA7D200357A93 /* Vico2.app */;
+			productType = "com.apple.product-type.application";
+		};
 		9A288E1D1398EA6F00258451 /* par */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A288E241398EA7000258451 /* Build configuration list for PBXNativeTarget "par" */;
@@ -1785,14 +2152,15 @@
 		9A2EF286133109C10023C5B7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 1120;
 			};
 			buildConfigurationList = 9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 9A2EF284133109C10023C5B7;
 			productRefGroup = 9A2EF290133109C10023C5B7 /* Products */;
@@ -1805,6 +2173,7 @@
 			);
 			projectRoot = "";
 			targets = (
+				17DD6D5E237FA7D200357A93 /* Vico2 */,
 				9A2EF28E133109C10023C5B7 /* Vico */,
 				9A2EF2AF133109C20023C5B7 /* Tests */,
 				9A2EF40F13310F4D0023C5B7 /* lemon */,
@@ -1853,6 +2222,78 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		17DD6E40237FA7D200357A93 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				17DD6E41237FA7D200357A93 /* Bundles in Resources */,
+				17DD6E42237FA7D200357A93 /* InfoPlist.strings in Resources */,
+				17DD6E43237FA7D200357A93 /* Credits.rtf in Resources */,
+				17DD6E44237FA7D200357A93 /* MainMenu.xib in Resources */,
+				17DD6E45237FA7D200357A93 /* CommandOutputWindow.xib in Resources */,
+				17DD6E46237FA7D200357A93 /* PreferenceWindow.xib in Resources */,
+				17DD6E47237FA7D200357A93 /* ViDocument.xib in Resources */,
+				17DD6E48237FA7D200357A93 /* ViDocumentWindow.xib in Resources */,
+				17DD6E49237FA7D200357A93 /* actionbarbg.png in Resources */,
+				17DD6E4A237FA7D200357A93 /* actionmenu.png in Resources */,
+				17DD6E4B237FA7D200357A93 /* add.png in Resources */,
+				17DD6E4C237FA7D200357A93 /* bookmark.png in Resources */,
+				17DD6E4D237FA7D200357A93 /* class.png in Resources */,
+				17DD6E4E237FA7D200357A93 /* define.png in Resources */,
+				17DD6E4F237FA7D200357A93 /* function.png in Resources */,
+				17DD6E50237FA7D200357A93 /* module.png in Resources */,
+				17DD6E51237FA7D200357A93 /* overflowImage.tiff in Resources */,
+				17DD6E52237FA7D200357A93 /* overflowImagePressed.tif in Resources */,
+				17DD6E53237FA7D200357A93 /* pi.png in Resources */,
+				17DD6E54237FA7D200357A93 /* resizehandle.png in Resources */,
+				17DD6E55237FA7D200357A93 /* TabClose_Front_Pressed.tif in Resources */,
+				17DD6E56237FA7D200357A93 /* TabClose_Front_Rollover.tif in Resources */,
+				17DD6E57237FA7D200357A93 /* TabClose_Front.tif in Resources */,
+				17DD6E58237FA7D200357A93 /* TabNewMetal.png in Resources */,
+				17DD6E59237FA7D200357A93 /* TabNewMetalPressed.png in Resources */,
+				17DD6E5A237FA7D200357A93 /* TabNewMetalRollover.png in Resources */,
+				17DD6E5B237FA7D200357A93 /* tag.png in Resources */,
+				17DD6E5C237FA7D200357A93 /* Support in Resources */,
+				17DD6E5D237FA7D200357A93 /* Themes in Resources */,
+				17DD6E5E237FA7D200357A93 /* symbol-icons.plist in Resources */,
+				17DD6E5F237FA7D200357A93 /* vico.nu in Resources */,
+				17DD6E60237FA7D200357A93 /* vico.icns in Resources */,
+				17DD6E61237FA7D200357A93 /* keys.nu in Resources */,
+				17DD6E62237FA7D200357A93 /* CompletionWindow.xib in Resources */,
+				17DD6E63237FA7D200357A93 /* ThemePrefs.xib in Resources */,
+				17DD6E64237FA7D200357A93 /* BundlePrefs.xib in Resources */,
+				17DD6E65237FA7D200357A93 /* EditPrefs.xib in Resources */,
+				17DD6E66237FA7D200357A93 /* GeneralPrefs.xib in Resources */,
+				17DD6E67237FA7D200357A93 /* Credits.txt in Resources */,
+				17DD6E68237FA7D200357A93 /* AdvancedPrefs.xib in Resources */,
+				17DD6E69237FA7D200357A93 /* ex.nu in Resources */,
+				17DD6E6A237FA7D200357A93 /* header.png in Resources */,
+				17DD6E6B237FA7D200357A93 /* AliasBadgeIcon.icns in Resources */,
+				17DD6E6C237FA7D200357A93 /* par.doc in Resources */,
+				17DD6E6D237FA7D200357A93 /* WaitProgress.xib in Resources */,
+				17DD6E6E237FA7D200357A93 /* MarkInspector.xib in Resources */,
+				17DD6E6F237FA7D200357A93 /* beautify.nu in Resources */,
+				17DD6E70237FA7D200357A93 /* status.nu in Resources */,
+				17DD6E71237FA7D200357A93 /* bridgesupport.nu in Resources */,
+				17DD6E72237FA7D200357A93 /* cblocks.nu in Resources */,
+				17DD6E73237FA7D200357A93 /* cocoa.nu in Resources */,
+				17DD6E74237FA7D200357A93 /* console.nu in Resources */,
+				17DD6E75237FA7D200357A93 /* coredata.nu in Resources */,
+				17DD6E76237FA7D200357A93 /* doc.nu in Resources */,
+				17DD6E77237FA7D200357A93 /* fscript.nu in Resources */,
+				17DD6E78237FA7D200357A93 /* generate.nu in Resources */,
+				17DD6E79237FA7D200357A93 /* help.nu in Resources */,
+				17DD6E7A237FA7D200357A93 /* match.nu in Resources */,
+				17DD6E7B237FA7D200357A93 /* SFBCrashReporterWindow.xib in Resources */,
+				17DD6E7C237FA7D200357A93 /* math.nu in Resources */,
+				17DD6E7D237FA7D200357A93 /* menu.nu in Resources */,
+				17DD6E7E237FA7D200357A93 /* nibtools.nu in Resources */,
+				17DD6E7F237FA7D200357A93 /* nu.nu in Resources */,
+				17DD6E80237FA7D200357A93 /* template.nu in Resources */,
+				17DD6E81237FA7D200357A93 /* test.nu in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A2EF28D133109C10023C5B7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1936,6 +2377,66 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		17DD6E3D237FA7D200357A93 /* Set version numbers in Info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Set version numbers in Info.plist";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "set -x\nREPO_VERSION=$(MACOSX_DEPLOYMENT_TARGET=\"\" git rev-parse --short HEAD)\nset -x\nFULL_INFOPLIST_PATH=${INSTALL_DIR}/${INFOPLIST_PATH}\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" \"${FULL_INFOPLIST_PATH}\"\nif test \"$CONFIGURATION\" == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=r$REPO_VERSION\nfi\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" \"${FULL_INFOPLIST_PATH}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		17DD6E3E237FA7D200357A93 /* Download bundle repo from GitHub */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Download bundle repo from GitHub";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if test \"$CONFIGURATION\" = \"Debug\"; then\n    echo \"ignoring downloading bundle repo in $CONFIGURATION build\"\n    exit 0\nfi\n\nUSERS=\"vicoapp textmate kswedberg\"\n\nfor user in $USERS; do\necho \"download bundle repository for $user\"\nif curl -s \"http://github.com/api/v2/json/user/show/$user\" | grep -q '\"type\":\"Organization\"'; then\nrepourl=\"http://github.com/api/v2/json/organizations/$user/public_repositories\"\nelse\nrepourl=\"http://github.com/api/v2/json/repos/show/$user\"\nfi\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nmkdir -p $RESOURCE_DIR\ncurl -s $repourl > $RESOURCE_DIR/$user-bundles.json\ndone\n";
+			showEnvVarsInLog = 0;
+		};
+		17DD6E3F237FA7D200357A93 /* Checkout bundles from GitHub */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Checkout bundles from GitHub";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if test \"$CONFIGURATION\" = \"Debug\"; then\n    echo \"ignoring checkout bundles in $CONFIGURATION build\"\n    exit 0\nfi\n\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nrsync -a --delete --exclude \".git\" $BUNDLES $BUNDLEDIR\n";
+			showEnvVarsInLog = 0;
+		};
+		17DD6E82237FA7D200357A93 /* Build help bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build help bundle";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "test \"$CONFIGURATION\" = \"Debug\" && exit\ntest \"$CONFIGURATION\" = \"Snapshot\" && exit\nHELP_SRC=$SOURCE_ROOT/help\nHELP_DST=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Vico.help/Contents/Resources\nHELP_EN=$HELP_DST/English.lproj\nrm -rf $HELP_DST\nmkdir -p $HELP_EN\ncp -f $HELP_SRC/index.html $HELP_EN/VicoHelp.html\ncp -f $HELP_SRC/help-Info.plist $HELP_DST/../Info.plist\ncp -f $HELP_SRC/help-InfoPlist.strings $HELP_EN/InfoPlist.strings\ncp -rf $HELP_SRC/shared $HELP_DST\ncd $HELP_EN && $HELP_SRC/md2html $HELP_SRC/*.md\nhiutil -vg -s en -Caf $HELP_EN/Vico.helpindex $HELP_EN\n";
+			showEnvVarsInLog = 0;
+		};
 		9A260675134F4F8F002C86FB /* Download bundle repo from GitHub */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
@@ -2013,6 +2514,220 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		17DD6D65237FA7D200357A93 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				17DD6D66237FA7D200357A93 /* NSCollection-enumeration.m in Sources */,
+				17DD6D67237FA7D200357A93 /* scope_selector.lemon in Sources */,
+				17DD6D68237FA7D200357A93 /* main.m in Sources */,
+				17DD6D69237FA7D200357A93 /* ExCommand.m in Sources */,
+				17DD6D6A237FA7D200357A93 /* MHTextIconCell.m in Sources */,
+				17DD6D6B237FA7D200357A93 /* NSArray-patterns.m in Sources */,
+				17DD6D6C237FA7D200357A93 /* NSObject+SPInvocationGrabbing.m in Sources */,
+				17DD6D6D237FA7D200357A93 /* NSScanner-additions.m in Sources */,
+				17DD6D6E237FA7D200357A93 /* NSString-additions.m in Sources */,
+				17DD6D6F237FA7D200357A93 /* NSString-scopeSelector.m in Sources */,
+				17DD6D70237FA7D200357A93 /* ViFileExplorer.m in Sources */,
+				17DD6D71237FA7D200357A93 /* PSMMetalTabStyle.m in Sources */,
+				17DD6D72237FA7D200357A93 /* PSMOverflowPopUpButton.m in Sources */,
+				17DD6D73237FA7D200357A93 /* PSMProgressIndicator.m in Sources */,
+				17DD6D74237FA7D200357A93 /* PSMRolloverButton.m in Sources */,
+				17DD6D75237FA7D200357A93 /* PSMTabBarCell.m in Sources */,
+				17DD6D76237FA7D200357A93 /* PSMTabBarControl.m in Sources */,
+				17DD6D77237FA7D200357A93 /* PSMTabDragAssistant.m in Sources */,
+				17DD6D78237FA7D200357A93 /* SFTPConnection.m in Sources */,
+				17DD6D79237FA7D200357A93 /* SFTPConnectionPool.m in Sources */,
+				17DD6D7A237FA7D200357A93 /* TMFileURLProtocol.m in Sources */,
+				17DD6D7B237FA7D200357A93 /* TxmtURLProtocol.m in Sources */,
+				17DD6D7C237FA7D200357A93 /* ViAppController.m in Sources */,
+				17DD6D7D237FA7D200357A93 /* ViBundle.m in Sources */,
+				17DD6D7E237FA7D200357A93 /* ViBundleCommand.m in Sources */,
+				17DD6D7F237FA7D200357A93 /* ViBundleItem.m in Sources */,
+				17DD6D80237FA7D200357A93 /* ViBundleSnippet.m in Sources */,
+				17DD6D81237FA7D200357A93 /* ViCharsetDetector.mm in Sources */,
+				17DD6D82237FA7D200357A93 /* ViParser.m in Sources */,
+				17DD6D83237FA7D200357A93 /* ViCommandOutputController.m in Sources */,
+				17DD6D84237FA7D200357A93 /* ViDocument.m in Sources */,
+				17DD6D85237FA7D200357A93 /* ViDocumentController.m in Sources */,
+				17DD6D86237FA7D200357A93 /* ViTabController.m in Sources */,
+				17DD6D87237FA7D200357A93 /* ViDocumentView.m in Sources */,
+				17DD6D88237FA7D200357A93 /* ViError.m in Sources */,
+				17DD6D89237FA7D200357A93 /* ViJumpList.m in Sources */,
+				17DD6D8A237FA7D200357A93 /* ViLanguage.m in Sources */,
+				17DD6D8B237FA7D200357A93 /* ViBundleStore.m in Sources */,
+				17DD6D8C237FA7D200357A93 /* ViLayoutManager.m in Sources */,
+				17DD6D8D237FA7D200357A93 /* ViMark.m in Sources */,
+				17DD6D8E237FA7D200357A93 /* ViOutlineView.m in Sources */,
+				17DD6D8F237FA7D200357A93 /* ViPreferencesController.m in Sources */,
+				17DD6D90237FA7D200357A93 /* ViProject.m in Sources */,
+				17DD6D91237FA7D200357A93 /* ViRegexp.m in Sources */,
+				17DD6D92237FA7D200357A93 /* ViRulerView.m in Sources */,
+				17DD6D93237FA7D200357A93 /* ViScope.m in Sources */,
+				17DD6D94237FA7D200357A93 /* ViSeparatorCell.m in Sources */,
+				17DD6D95237FA7D200357A93 /* ViSnippet.m in Sources */,
+				17DD6D96237FA7D200357A93 /* ViSymbolTransform.m in Sources */,
+				17DD6D97237FA7D200357A93 /* ViSyntaxContext.m in Sources */,
+				17DD6D98237FA7D200357A93 /* ViLineNumberView.m in Sources */,
+				17DD6D99237FA7D200357A93 /* ViSyntaxMatch.m in Sources */,
+				17DD6D9A237FA7D200357A93 /* ViSyntaxParser.m in Sources */,
+				17DD6D9B237FA7D200357A93 /* ViCommandMenuItemView.m in Sources */,
+				17DD6D9C237FA7D200357A93 /* ViTagsDatabase.m in Sources */,
+				17DD6D9D237FA7D200357A93 /* ViTextStorage.m in Sources */,
+				17DD6D9E237FA7D200357A93 /* ViTextView-bundle_commands.m in Sources */,
+				17DD6D9F237FA7D200357A93 /* ViTextView-cursor.m in Sources */,
+				17DD6DA0237FA7D200357A93 /* ViTextView-snippets.m in Sources */,
+				17DD6DA1237FA7D200357A93 /* ViTextView-vi_commands.m in Sources */,
+				17DD6DA2237FA7D200357A93 /* ViTextView.m in Sources */,
+				17DD6DA3237FA7D200357A93 /* ViTheme.m in Sources */,
+				17DD6DA4237FA7D200357A93 /* ViThemeStore.m in Sources */,
+				17DD6DA5237FA7D200357A93 /* ViToolbarPopUpButtonCell.m in Sources */,
+				17DD6DA6237FA7D200357A93 /* ViTransformer.m in Sources */,
+				17DD6DA7237FA7D200357A93 /* ViWebView.m in Sources */,
+				17DD6DA8237FA7D200357A93 /* ViWindow.m in Sources */,
+				17DD6DA9237FA7D200357A93 /* ViWindowController.m in Sources */,
+				17DD6DAA237FA7D200357A93 /* CharDistribution.cpp in Sources */,
+				17DD6DAB237FA7D200357A93 /* JpCntx.cpp in Sources */,
+				17DD6DAC237FA7D200357A93 /* LangBulgarianModel.cpp in Sources */,
+				17DD6DAD237FA7D200357A93 /* LangCyrillicModel.cpp in Sources */,
+				17DD6DAE237FA7D200357A93 /* LangGreekModel.cpp in Sources */,
+				17DD6DAF237FA7D200357A93 /* LangHebrewModel.cpp in Sources */,
+				17DD6DB0237FA7D200357A93 /* LangHungarianModel.cpp in Sources */,
+				17DD6DB1237FA7D200357A93 /* LangThaiModel.cpp in Sources */,
+				17DD6DB2237FA7D200357A93 /* nsBig5Prober.cpp in Sources */,
+				17DD6DB3237FA7D200357A93 /* nsCharSetProber.cpp in Sources */,
+				17DD6DB4237FA7D200357A93 /* nsEscCharsetProber.cpp in Sources */,
+				17DD6DB5237FA7D200357A93 /* nsEscSM.cpp in Sources */,
+				17DD6DB6237FA7D200357A93 /* ViGlyphGenerator.m in Sources */,
+				17DD6DB7237FA7D200357A93 /* nsEUCJPProber.cpp in Sources */,
+				17DD6DB8237FA7D200357A93 /* nsEUCKRProber.cpp in Sources */,
+				17DD6DB9237FA7D200357A93 /* nsEUCTWProber.cpp in Sources */,
+				17DD6DBA237FA7D200357A93 /* nsGB2312Prober.cpp in Sources */,
+				17DD6DBB237FA7D200357A93 /* nsHebrewProber.cpp in Sources */,
+				17DD6DBC237FA7D200357A93 /* nsLatin1Prober.cpp in Sources */,
+				17DD6DBD237FA7D200357A93 /* nsMBCSGroupProber.cpp in Sources */,
+				17DD6DBE237FA7D200357A93 /* nsMBCSSM.cpp in Sources */,
+				17DD6DBF237FA7D200357A93 /* nsSBCharSetProber.cpp in Sources */,
+				17DD6DC0237FA7D200357A93 /* nsSBCSGroupProber.cpp in Sources */,
+				17DD6DC1237FA7D200357A93 /* nsSJISProber.cpp in Sources */,
+				17DD6DC2237FA7D200357A93 /* nsUniversalDetector.cpp in Sources */,
+				17DD6DC3237FA7D200357A93 /* nsUTF8Prober.cpp in Sources */,
+				17DD6DC4237FA7D200357A93 /* regcomp.c in Sources */,
+				17DD6DC5237FA7D200357A93 /* regenc.c in Sources */,
+				17DD6DC6237FA7D200357A93 /* regerror.c in Sources */,
+				17DD6DC7237FA7D200357A93 /* regexec.c in Sources */,
+				17DD6DC8237FA7D200357A93 /* regext.c in Sources */,
+				17DD6DC9237FA7D200357A93 /* reggnu.c in Sources */,
+				17DD6DCA237FA7D200357A93 /* regparse.c in Sources */,
+				17DD6DCB237FA7D200357A93 /* regposerr.c in Sources */,
+				17DD6DCC237FA7D200357A93 /* regposix.c in Sources */,
+				17DD6DCD237FA7D200357A93 /* regsyntax.c in Sources */,
+				17DD6DCE237FA7D200357A93 /* regtrav.c in Sources */,
+				17DD6DCF237FA7D200357A93 /* regversion.c in Sources */,
+				17DD6DD0237FA7D200357A93 /* st.c in Sources */,
+				17DD6DD1237FA7D200357A93 /* ascii.c in Sources */,
+				17DD6DD2237FA7D200357A93 /* big5.c in Sources */,
+				17DD6DD3237FA7D200357A93 /* cp1251.c in Sources */,
+				17DD6DD4237FA7D200357A93 /* euc_jp.c in Sources */,
+				17DD6DD5237FA7D200357A93 /* euc_kr.c in Sources */,
+				17DD6DD6237FA7D200357A93 /* euc_tw.c in Sources */,
+				17DD6DD7237FA7D200357A93 /* gb18030.c in Sources */,
+				17DD6DD8237FA7D200357A93 /* iso8859_1.c in Sources */,
+				17DD6DD9237FA7D200357A93 /* iso8859_2.c in Sources */,
+				17DD6DDA237FA7D200357A93 /* iso8859_3.c in Sources */,
+				17DD6DDB237FA7D200357A93 /* iso8859_4.c in Sources */,
+				17DD6DDC237FA7D200357A93 /* iso8859_5.c in Sources */,
+				17DD6DDD237FA7D200357A93 /* iso8859_6.c in Sources */,
+				17DD6DDE237FA7D200357A93 /* iso8859_7.c in Sources */,
+				17DD6DDF237FA7D200357A93 /* iso8859_8.c in Sources */,
+				17DD6DE0237FA7D200357A93 /* iso8859_9.c in Sources */,
+				17DD6DE1237FA7D200357A93 /* iso8859_10.c in Sources */,
+				17DD6DE2237FA7D200357A93 /* iso8859_11.c in Sources */,
+				17DD6DE3237FA7D200357A93 /* iso8859_13.c in Sources */,
+				17DD6DE4237FA7D200357A93 /* iso8859_14.c in Sources */,
+				17DD6DE5237FA7D200357A93 /* iso8859_15.c in Sources */,
+				17DD6DE6237FA7D200357A93 /* iso8859_16.c in Sources */,
+				17DD6DE7237FA7D200357A93 /* koi8_r.c in Sources */,
+				17DD6DE8237FA7D200357A93 /* koi8.c in Sources */,
+				17DD6DE9237FA7D200357A93 /* sjis.c in Sources */,
+				17DD6DEA237FA7D200357A93 /* unicode.c in Sources */,
+				17DD6DEB237FA7D200357A93 /* utf8.c in Sources */,
+				17DD6DEC237FA7D200357A93 /* utf16_be.c in Sources */,
+				17DD6DED237FA7D200357A93 /* utf16_le.c in Sources */,
+				17DD6DEE237FA7D200357A93 /* utf32_be.c in Sources */,
+				17DD6DEF237FA7D200357A93 /* utf32_le.c in Sources */,
+				17DD6DF0237FA7D200357A93 /* SBJsonParser.m in Sources */,
+				17DD6DF1237FA7D200357A93 /* SBJsonStreamParser.m in Sources */,
+				17DD6DF2237FA7D200357A93 /* SBJsonStreamParserAdapter.m in Sources */,
+				17DD6DF3237FA7D200357A93 /* SBJsonStreamParserState.m in Sources */,
+				17DD6DF4237FA7D200357A93 /* SBJsonStreamWriter.m in Sources */,
+				17DD6DF5237FA7D200357A93 /* SBJsonStreamWriterState.m in Sources */,
+				17DD6DF6237FA7D200357A93 /* SBJsonTokeniser.m in Sources */,
+				17DD6DF7237FA7D200357A93 /* SBJsonWriter.m in Sources */,
+				17DD6DF8237FA7D200357A93 /* NSEvent-keyAdditions.m in Sources */,
+				17DD6DF9237FA7D200357A93 /* ViCommand.m in Sources */,
+				17DD6DFA237FA7D200357A93 /* ViMap.m in Sources */,
+				17DD6DFB237FA7D200357A93 /* ViKeyManager.m in Sources */,
+				17DD6DFC237FA7D200357A93 /* ViRegisterManager.m in Sources */,
+				17DD6DFD237FA7D200357A93 /* ViMacro.m in Sources */,
+				17DD6DFE237FA7D200357A93 /* ExTextField.m in Sources */,
+				17DD6DFF237FA7D200357A93 /* ViCompletionController.m in Sources */,
+				17DD6E00237FA7D200357A93 /* ViTypesetter.m in Sources */,
+				17DD6E01237FA7D200357A93 /* ViCompletionView.m in Sources */,
+				17DD6E02237FA7D200357A93 /* ViCompletionWindow.m in Sources */,
+				17DD6E03237FA7D200357A93 /* ViCompletion.m in Sources */,
+				17DD6E04237FA7D200357A93 /* ViSymbolController.m in Sources */,
+				17DD6E05237FA7D200357A93 /* ViPreferencePane.m in Sources */,
+				17DD6E06237FA7D200357A93 /* ViPreferencePaneGeneral.m in Sources */,
+				17DD6E07237FA7D200357A93 /* ViPreferencePaneTheme.m in Sources */,
+				17DD6E08237FA7D200357A93 /* ViPreferencePaneBundles.m in Sources */,
+				17DD6E09237FA7D200357A93 /* ViPreferencePaneEdit.m in Sources */,
+				17DD6E0A237FA7D200357A93 /* ViFileURLHandler.m in Sources */,
+				17DD6E0B237FA7D200357A93 /* ViURLManager.m in Sources */,
+				17DD6E0C237FA7D200357A93 /* ViSFTPURLHandler.m in Sources */,
+				17DD6E0D237FA7D200357A93 /* ViHTTPURLHandler.m in Sources */,
+				17DD6E0E237FA7D200357A93 /* ViBufferedStream.m in Sources */,
+				17DD6E0F237FA7D200357A93 /* ViBufferCompletion.m in Sources */,
+				17DD6E10237FA7D200357A93 /* ViFileCompletion.m in Sources */,
+				17DD6E11237FA7D200357A93 /* ViWordCompletion.m in Sources */,
+				17DD6E12237FA7D200357A93 /* ViPreferencePaneAdvanced.m in Sources */,
+				17DD6E13237FA7D200357A93 /* ExCommandCompletion.m in Sources */,
+				17DD6E14237FA7D200357A93 /* ViSyntaxCompletion.m in Sources */,
+				17DD6E15237FA7D200357A93 /* ViEventManager.m in Sources */,
+				17DD6E16237FA7D200357A93 /* ViTextView-ex_commands.m in Sources */,
+				17DD6E17237FA7D200357A93 /* NSURL-additions.m in Sources */,
+				17DD6E18237FA7D200357A93 /* ViFoldMarginView.m in Sources */,
+				17DD6E19237FA7D200357A93 /* NSView-additions.m in Sources */,
+				17DD6E1A237FA7D200357A93 /* ExAddress.m in Sources */,
+				17DD6E1B237FA7D200357A93 /* ExMap.m in Sources */,
+				17DD6E1C237FA7D200357A93 /* ExParser.m in Sources */,
+				17DD6E1D237FA7D200357A93 /* ViBgView.m in Sources */,
+				17DD6E1E237FA7D200357A93 /* ViPathComponentCell.m in Sources */,
+				17DD6E1F237FA7D200357A93 /* ViPathCell.m in Sources */,
+				17DD6E20237FA7D200357A93 /* NSOutlineView-vimotions.m in Sources */,
+				17DD6E21237FA7D200357A93 /* NSTableView-vimotions.m in Sources */,
+				17DD6E22237FA7D200357A93 /* NSTask-streaming.m in Sources */,
+				17DD6E23237FA7D200357A93 /* ViTaskRunner.m in Sources */,
+				17DD6E24237FA7D200357A93 /* ViFile.m in Sources */,
+				17DD6E25237FA7D200357A93 /* ViMarkManager.m in Sources */,
+				17DD6E26237FA7D200357A93 /* ViMarkInspector.m in Sources */,
+				17DD6E27237FA7D200357A93 /* NSMenu-additions.m in Sources */,
+				17DD6E28237FA7D200357A93 /* NSWindow-additions.m in Sources */,
+				17DD6E29237FA7D200357A93 /* ViViewController.m in Sources */,
+				17DD6E2A237FA7D200357A93 /* Nu.m in Sources */,
+				17DD6E2B237FA7D200357A93 /* ViFold.m in Sources */,
+				17DD6E2C237FA7D200357A93 /* ViStatusView.m in Sources */,
+				17DD6E2D237FA7D200357A93 /* SBJsonStreamParserAccumulator.m in Sources */,
+				17DD6E2E237FA7D200357A93 /* SBJsonStreamTokeniser.m in Sources */,
+				17DD6E2F237FA7D200357A93 /* SBJsonStreamWriterAccumulator.m in Sources */,
+				17DD6E30237FA7D200357A93 /* SFBCrashReporter.m in Sources */,
+				17DD6E31237FA7D200357A93 /* SFBCrashReporterWindowController.m in Sources */,
+				17DD6E32237FA7D200357A93 /* SFBSystemInformation.m in Sources */,
+				17DD6E33237FA7D200357A93 /* GenerateFormData.m in Sources */,
+				17DD6E34237FA7D200357A93 /* SBJsonUTF8Stream.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A288E1A1398EA6F00258451 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2285,6 +3000,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		17DD6D5F237FA7D200357A93 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A288E1D1398EA6F00258451 /* par */;
+			targetProxy = 17DD6D60237FA7D200357A93 /* PBXContainerItemProxy */;
+		};
+		17DD6D61237FA7D200357A93 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A4346DC1331257A002B04DE /* vicotool */;
+			targetProxy = 17DD6D62237FA7D200357A93 /* PBXContainerItemProxy */;
+		};
+		17DD6D63237FA7D200357A93 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A2EF40F13310F4D0023C5B7 /* lemon */;
+			targetProxy = 17DD6D64237FA7D200357A93 /* PBXContainerItemProxy */;
+		};
 		9A288E371398EAD200258451 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9A288E1D1398EA6F00258451 /* par */;
@@ -2311,7 +3041,7 @@
 		1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1732DB02181EF25000890055 /* en */,
+				17DD6E8D237FAC5400357A93 /* Base */,
 			);
 			name = SFBCrashReporterWindow.xib;
 			path = ..;
@@ -2320,7 +3050,7 @@
 		9A26066F134C50C3002C86FB /* CompletionWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A260670134C50C3002C86FB /* en */,
+				17DD6E98237FAC5400357A93 /* Base */,
 			);
 			name = CompletionWindow.xib;
 			sourceTree = "<group>";
@@ -2328,7 +3058,7 @@
 		9A2606A2135B17F2002C86FB /* ThemePrefs.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A2606A3135B17F2002C86FB /* en */,
+				17DD6E94237FAC5400357A93 /* Base */,
 			);
 			name = ThemePrefs.xib;
 			sourceTree = "<group>";
@@ -2336,7 +3066,7 @@
 		9A2606B2135B1C63002C86FB /* BundlePrefs.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A2606B3135B1C63002C86FB /* en */,
+				17DD6E90237FAC5400357A93 /* Base */,
 			);
 			name = BundlePrefs.xib;
 			sourceTree = "<group>";
@@ -2360,7 +3090,7 @@
 		9A2EF2A8133109C20023C5B7 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A2EF2A9133109C20023C5B7 /* en */,
+				17DD6E97237FAC5400357A93 /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -2376,7 +3106,7 @@
 		9A43469C13311615002B04DE /* CommandOutputWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A43469D13311615002B04DE /* en */,
+				17DD6E8E237FAC5400357A93 /* Base */,
 			);
 			name = CommandOutputWindow.xib;
 			sourceTree = "<group>";
@@ -2384,7 +3114,7 @@
 		9A43469E13311615002B04DE /* PreferenceWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A43469F13311615002B04DE /* en */,
+				17DD6E93237FAC5400357A93 /* Base */,
 			);
 			name = PreferenceWindow.xib;
 			sourceTree = "<group>";
@@ -2392,7 +3122,7 @@
 		9A4346A013311615002B04DE /* ViDocument.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A4346A113311615002B04DE /* en */,
+				17DD6E95237FAC5400357A93 /* Base */,
 			);
 			name = ViDocument.xib;
 			sourceTree = "<group>";
@@ -2400,7 +3130,7 @@
 		9A4346A213311615002B04DE /* ViDocumentWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A4346A313311615002B04DE /* en */,
+				17DD6E96237FAC5400357A93 /* Base */,
 			);
 			name = ViDocumentWindow.xib;
 			sourceTree = "<group>";
@@ -2408,7 +3138,7 @@
 		9A66526F135B21D700A2F93C /* EditPrefs.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A665270135B21D700A2F93C /* en */,
+				17DD6E91237FAC5400357A93 /* Base */,
 			);
 			name = EditPrefs.xib;
 			path = ..;
@@ -2417,7 +3147,7 @@
 		9A665276135B288700A2F93C /* GeneralPrefs.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9A665277135B288700A2F93C /* en */,
+				17DD6E92237FAC5400357A93 /* Base */,
 			);
 			name = GeneralPrefs.xib;
 			sourceTree = "<group>";
@@ -2425,7 +3155,7 @@
 		9AB6F72D14160751000F3578 /* WaitProgress.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9AB6F72E14160751000F3578 /* en */,
+				17DD6E99237FAC5400357A93 /* Base */,
 			);
 			name = WaitProgress.xib;
 			sourceTree = "<group>";
@@ -2433,7 +3163,7 @@
 		9ACFDFBC141A084700D4DBE1 /* MarkInspector.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9ACFDFBD141A084700D4DBE1 /* en */,
+				17DD6E9A237FAC5400357A93 /* Base */,
 			);
 			name = MarkInspector.xib;
 			sourceTree = "<group>";
@@ -2441,7 +3171,7 @@
 		9AF71075137BC12900EC858E /* AdvancedPrefs.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9AF71076137BC12900EC858E /* en */,
+				17DD6E8F237FAC5400357A93 /* Base */,
 			);
 			name = AdvancedPrefs.xib;
 			sourceTree = "<group>";
@@ -2449,14 +3179,153 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		17DD6E88237FA7D200357A93 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					json,
+					sftp,
+					oniguruma,
+					universalchardet,
+					Sparkle,
+				);
+				INFOPLIST_FILE = "Vico copy-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_LDFLAGS = (
+					"-lresolv",
+					"-lffi",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = se.bzero.Vico;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = x86_64;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		17DD6E89237FA7D200357A93 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"RELEASE_BUILD=1",
+					"NDEBUG=1",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				HEADER_SEARCH_PATHS = (
+					json,
+					sftp,
+					oniguruma,
+					universalchardet,
+					Sparkle,
+				);
+				INFOPLIST_FILE = "Vico copy-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_LDFLAGS = (
+					"-lresolv",
+					"-lffi",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = se.bzero.Vico;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = x86_64;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		17DD6E8A237FA7D200357A93 /* Snapshot */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					DEBUG,
+					"DEBUG_BUILD=1",
+					"SNAPSHOT_BUILD=1",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				HEADER_SEARCH_PATHS = (
+					json,
+					sftp,
+					oniguruma,
+					universalchardet,
+					Sparkle,
+				);
+				INFOPLIST_FILE = "Vico copy-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_LDFLAGS = (
+					"-lresolv",
+					"-lffi",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = se.bzero.Vico;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = x86_64;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Snapshot;
+		};
 		9A26068B135316F7002C86FB /* Snapshot */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_OBJC_GC = unsupported;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"NDEBUG=1",
@@ -2467,6 +3336,9 @@
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -2476,7 +3348,8 @@
 					universalchardet,
 				);
 				KEEP_PRIVATE_EXTERNS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -2489,7 +3362,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2520,6 +3393,7 @@
 					"-lresolv",
 					"-lffi",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = se.bzero.Vico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = x86_64;
@@ -2544,6 +3418,7 @@
 					"-framework",
 					SenTestingKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "se.bzero.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -2554,6 +3429,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -2566,6 +3442,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -2582,6 +3459,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2596,6 +3474,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2609,6 +3488,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2622,10 +3502,29 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_OBJC_GC = unsupported;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					DEBUG,
@@ -2635,6 +3534,9 @@
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -2644,8 +3546,9 @@
 					universalchardet,
 				);
 				KEEP_PRIVATE_EXTERNS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -2657,9 +3560,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_OBJC_GC = unsupported;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"RELEASE_BUILD=1",
 					"NDEBUG=1",
@@ -2669,6 +3590,9 @@
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -2678,7 +3602,8 @@
 					universalchardet,
 				);
 				KEEP_PRIVATE_EXTERNS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				TEST_AFTER_BUILD = YES;
@@ -2690,7 +3615,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2715,6 +3640,7 @@
 					"-lresolv",
 					"-lffi",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = se.bzero.Vico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
@@ -2726,7 +3652,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2756,6 +3682,7 @@
 					"-lresolv",
 					"-lffi",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = se.bzero.Vico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = x86_64;
@@ -2780,6 +3707,7 @@
 					"-framework",
 					SenTestingKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "se.bzero.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -2803,6 +3731,7 @@
 					"-framework",
 					SenTestingKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "se.bzero.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -2813,6 +3742,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -2825,6 +3755,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -2837,6 +3768,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2852,6 +3784,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -2867,6 +3800,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		17DD6E87237FA7D200357A93 /* Build configuration list for PBXNativeTarget "Vico2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				17DD6E88237FA7D200357A93 /* Debug */,
+				17DD6E89237FA7D200357A93 /* Release */,
+				17DD6E8A237FA7D200357A93 /* Snapshot */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Snapshot;
+		};
 		9A288E241398EA7000258451 /* Build configuration list for PBXNativeTarget "par" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

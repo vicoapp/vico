@@ -185,8 +185,6 @@ static NSNumber * int64ForSysctlName(const char *name, NSError **error)
 		case CPUFAMILY_POWERPC_G4:		familyName = NSLocalizedString(@"PowerPC G4", @"");					break;
 		case CPUFAMILY_POWERPC_G5:		familyName = NSLocalizedString(@"PowerPC G5", @"");					break;
 		case CPUFAMILY_INTEL_6_13:		familyName = NSLocalizedString(@"Intel Core", @"");					break;
-		case CPUFAMILY_INTEL_6_14:		familyName = NSLocalizedString(@"Intel Core (Yonah)", @"");			break;
-		case CPUFAMILY_INTEL_6_15:		familyName = NSLocalizedString(@"Intel Core 2 (Merom)", @"");		break;
 		case CPUFAMILY_INTEL_6_23:		familyName = NSLocalizedString(@"Intel Core 2 (Penryn)", @"");		break;
 		case CPUFAMILY_INTEL_6_26:		familyName = NSLocalizedString(@"Intel Xeon (Nehalem)", @"");		break;
 		case CPUFAMILY_ARM_9:			familyName = NSLocalizedString(@"ARM 9", @"");						break;

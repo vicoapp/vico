@@ -294,7 +294,7 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>Vico</string>
+	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>Vico.help</string>
 	<key>CFBundleHelpBookName</key>
@@ -302,7 +302,7 @@
 	<key>CFBundleIconFile</key>
 	<string>vico.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>se.bzero.Vico</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

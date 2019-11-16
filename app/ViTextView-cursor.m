@@ -302,7 +302,8 @@
 
 + (NSCursor *)defaultIBeamCursor
 {
-	return [self defaultIBeamCursorImplementation]([NSCursor class], @selector(IBeamCursor));
+    NSCursor* (*ibeamCursorImpl)(id, SEL) = (NSCursor* (*)(id, SEL))[self defaultIBeamCursorImplementation];
+	return ibeamCursorImpl([NSCursor class], @selector(IBeamCursor));
 }
 
 + (NSCursor *)whiteIBeamCursor
